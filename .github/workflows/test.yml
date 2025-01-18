@@ -1,0 +1,44 @@
+# Based on example from https://github.com/julia-actions/julia-runtest
+name: Run tests
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+      fail-fast: false
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@latest
+      - uses: julia-actions/cache@v2
+      - uses: julia-actions/julia-buildpkg@v1
+      - uses: julia-actions/julia-runtest@v1
+
+  test-check-bounds-auto:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+      fail-fast: false
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@latest
+      - uses: julia-actions/cache@v2
+      - uses: julia-actions/julia-buildpkg@v1
+      # The following is copied and simplified from
+      # https://github.com/julia-actions/julia-runtest/blob/master/action.yml
+      # in order to pass customised arguments to `Pkg.test()`
+      - run: |
+          julia --color=yes --depwarn=yes --project -e 'import Pkg; Pkg.test(; julia_args=["--check-bounds=auto"])'
+        shell: bash

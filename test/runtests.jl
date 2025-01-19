@@ -3,6 +3,12 @@ module InboundsArraysTests
 using InboundsArrays
 using Test
 
+# Import packages for extensions if possible
+try
+    using MPI
+catch
+end
+
 function isequal(args...)
     return isapprox(args...; rtol=0.0, atol=0.0)
 end
@@ -160,6 +166,28 @@ function runtests()
             @test size(d) == (3, 5)
 
             @test axes(a) == (1:2, 1:2, 1:2)
+        end
+
+        mpiext = Base.get_extension(InboundsArrays, :MPIExt)
+        if mpiext !== nothing
+            @testset "MPIExt" begin
+                a = InboundsArray(ones(3, 4, 5))
+                b = similar(a)
+
+                MPI.Init()
+
+                MPI.Allgather!(a, b, MPI.COMM_WORLD)
+                @test isequal(b, ones(3, 4, 5))
+
+                b .= 0.0
+                vb = MPI.VBuffer(b, [3 * 4 * 5])
+                MPI.Allgatherv!(a, vb, MPI.COMM_WORLD)
+                @test isequal(b, ones(3, 4, 5))
+
+                b .= 0.0
+                MPI.Bcast!(a, 0, MPI.COMM_WORLD)
+                @test isequal(a, ones(3, 4, 5))
+            end
         end
     end
 

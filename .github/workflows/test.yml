@@ -20,6 +20,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@latest
       - uses: julia-actions/cache@v2
+      - run: |
+          julia --project -e 'import Pkg; Pkg.add(["MPI"])'
+        shell: bash
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
 
@@ -35,6 +38,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: julia-actions/setup-julia@latest
       - uses: julia-actions/cache@v2
+      - run: |
+          julia --project -e 'import Pkg; Pkg.add(["MPI"])'
+        shell: bash
       - uses: julia-actions/julia-buildpkg@v1
       # The following is copied and simplified from
       # https://github.com/julia-actions/julia-runtest/blob/master/action.yml

@@ -29,7 +29,8 @@ the bounds checks.
 """
 module InboundsArrays
 
-export InboundsArray, InboundsVector, InboundsMatrix, AbstractInboundsArray
+export InboundsArray, InboundsVector, InboundsMatrix, AbstractInboundsArray,
+       InboundsSparseMatrixCSC, InboundsSparseVector, InboundsSparseMatrixCSR
 
 abstract type AbstractInboundsArray{T, N} <: AbstractArray{T, N} end
 
@@ -177,5 +178,6 @@ end
 end
 
 include("LinearAlgebra_support.jl")
+include("SparseArrays_support.jl")
 
 end # module InboundsArrays

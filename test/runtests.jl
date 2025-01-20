@@ -4,6 +4,7 @@ using InboundsArrays
 using Test
 
 using LinearAlgebra
+using SparseArrays
 
 # Import packages for extensions if possible
 try
@@ -233,6 +234,202 @@ function runtests()
             D = A \ AB
             @test isclose(D, B)
             @test D isa InboundsMatrix
+        end
+
+        @testset "SparseArrays interface" begin
+            A = InboundsArray([1.0 2.0; 3.0 4.0])
+            B = InboundsArray([5.0 6.0; 7.0 8.0])
+            C = InboundsArray([9.0 10.0; 11.0 12.0])
+            x = InboundsArray([5.0, 7.0])
+            y = InboundsArray([6.0, 8.0])
+
+            sA = sparse(A)
+            @test isequal(A, sA)
+            @test sA isa InboundsSparseMatrixCSC
+
+            mul!(y, sA, x)
+            @test isequal(y, [19.0, 43.0])
+            @test y isa InboundsVector
+
+            z = sA * x
+            @test isequal(z, [19.0, 43.0])
+            @test z isa InboundsVector
+
+            y .= [6.0, 8.0]
+            mul!(y, sA, x, 2.0, 3.0)
+            @test isequal(y, [56.0, 110.0])
+            @test y isa InboundsVector
+
+            mul!(C, sA, B)
+            @test isequal(C, [19.0 22.0; 43.0 50.0])
+            @test C isa InboundsMatrix
+
+            D = sA * B
+            @test isequal(D, [19.0 22.0; 43.0 50.0])
+            @test D isa InboundsMatrix
+
+            C .= [9.0 10.0; 11.0 12.0]
+            mul!(C, sA, B, 2.0, 3.0)
+            @test isequal(C, [65.0 74.0; 119.0 136.0])
+            @test C isa InboundsMatrix
+
+            Ax = InboundsArray([19.0, 43.0])
+            sAlu = lu(sA)
+            ldiv!(y, sAlu, Ax)
+            @test isclose(y, x)
+            @test y isa InboundsVector
+
+            z = sAlu \ Ax
+            @test isclose(z, x)
+            @test z isa InboundsVector
+
+            z = sA \ Ax
+            @test isclose(z, x)
+            @test z isa InboundsVector
+
+            AB = InboundsArray([19.0 22.0; 43.0 50.0])
+            ldiv!(C, sAlu, AB)
+            @test isclose(C, B)
+            @test C isa InboundsMatrix
+
+            D = sAlu \ AB
+            @test isclose(D, B)
+            @test D isa InboundsMatrix
+
+            D = sA \ AB
+            @test isclose(D, B)
+            @test D isa InboundsMatrix
+
+            sB = sparse(B)
+            sC = sparse(C)
+            sx = sparse(x)
+            sy = sparse(y)
+
+            mul!(sy, sA, sx)
+            @test isequal(sy, [19.0, 43.0])
+            @test sy isa InboundsSparseVector
+
+            z = sA * sx
+            @test isequal(z, [19.0, 43.0])
+            @test z isa InboundsSparseVector
+
+            sy .= [6.0, 8.0]
+            mul!(sy, sA, sx, 2.0, 3.0)
+            @test isequal(sy, [56.0, 110.0])
+            @test sy isa InboundsSparseVector
+
+            mul!(sC, sA, sB)
+            @test isequal(sC, [19.0 22.0; 43.0 50.0])
+            @test sC isa InboundsSparseMatrixCSC
+
+            D = sA * sB
+            @test isequal(D, [19.0 22.0; 43.0 50.0])
+            @test D isa InboundsSparseMatrixCSC
+
+            sC .= [9.0 10.0; 11.0 12.0]
+            mul!(sC, sA, sB, 2.0, 3.0)
+            @test isequal(sC, [65.0 74.0; 119.0 136.0])
+            @test sC isa InboundsSparseMatrixCSC
+        end
+
+        @testset "SparseMatricesCSR interface" begin
+            A = InboundsArray([1.0 2.0; 3.0 4.0])
+            B = InboundsArray([5.0 6.0; 7.0 8.0])
+            C = InboundsArray([9.0 10.0; 11.0 12.0])
+            x = InboundsArray([5.0, 7.0])
+            y = InboundsArray([6.0, 8.0])
+
+            sA = convert(InboundsSparseMatrixCSR{1, Float64, Int64}, A)
+            @test isequal(A, sA)
+            @test sA isa InboundsSparseMatrixCSR
+
+            mul!(y, sA, x)
+            @test isequal(y, [19.0, 43.0])
+            @test y isa InboundsVector
+
+            z = sA * x
+            @test isequal(z, [19.0, 43.0])
+            @test z isa InboundsVector
+
+            y .= [6.0, 8.0]
+            mul!(y, sA, x, 2.0, 3.0)
+            @test isequal(y, [56.0, 110.0])
+            @test y isa InboundsVector
+
+            mul!(C, sA, B)
+            @test isequal(C, [19.0 22.0; 43.0 50.0])
+            @test C isa InboundsMatrix
+
+            D = sA * B
+            @test isequal(D, [19.0 22.0; 43.0 50.0])
+            @test D isa InboundsMatrix
+
+            C .= [9.0 10.0; 11.0 12.0]
+            mul!(C, sA, B, 2.0, 3.0)
+            @test isequal(C, [65.0 74.0; 119.0 136.0])
+            @test C isa InboundsMatrix
+
+            Ax = InboundsArray([19.0, 43.0])
+            sAlu = lu(sA)
+            ldiv!(y, sAlu, Ax)
+            @test isclose(y, x)
+            @test y isa InboundsVector
+
+            z = sAlu \ Ax
+            @test isclose(z, x)
+            @test z isa InboundsVector
+
+            z = sA \ Ax
+            @test isclose(z, x)
+            @test z isa InboundsVector
+
+            AB = InboundsArray([19.0 22.0; 43.0 50.0])
+            ldiv!(C, sAlu, AB)
+            @test isclose(C, B)
+            @test C isa InboundsMatrix
+
+            D = sAlu \ AB
+            @test isclose(D, B)
+            @test D isa InboundsMatrix
+
+            D = sA \ AB
+            @test isclose(D, B)
+            @test D isa InboundsMatrix
+
+            sB = convert(InboundsSparseMatrixCSR{1, Float64, Int64}, B)
+            sC = convert(InboundsSparseMatrixCSR{1, Float64, Int64}, C)
+            sx = sparse(x)
+            sy = sparse(y)
+
+            mul!(sy, sA, sx)
+            @test isequal(sy, [19.0, 43.0])
+            @test sy isa InboundsSparseVector
+
+            z = sA * sx
+            @test isequal(z, [19.0, 43.0])
+            @test z isa InboundsSparseVector
+
+            sy .= [6.0, 8.0]
+            mul!(sy, sA, sx, 2.0, 3.0)
+            @test isequal(sy, [56.0, 110.0])
+            @test sy isa InboundsSparseVector
+
+            mul!(sC, sA, sB)
+            @test isequal(sC, [19.0 22.0; 43.0 50.0])
+            @test sC isa InboundsSparseMatrixCSR
+
+            D = sA * sB
+            @test isequal(D, [19.0 22.0; 43.0 50.0])
+            # For some reason a SparseMatrixCSR multiplied by SparseMatrixCSR returns a
+            # Matrix, so we do the same with the Inbounds versions, and so D should be a
+            # Matrix.
+            @test sA.parent * sB.parent isa Matrix
+            @test D isa Matrix
+
+            sC .= [9.0 10.0; 11.0 12.0]
+            mul!(sC, sA, sB, 2.0, 3.0)
+            @test isequal(sC, [65.0 74.0; 119.0 136.0])
+            @test sC isa InboundsSparseMatrixCSR
         end
 
         mpiext = Base.get_extension(InboundsArrays, :MPIExt)

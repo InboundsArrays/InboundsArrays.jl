@@ -139,6 +139,8 @@ BroadcastStyle(::Type{<:InboundsArray{T, N, TArray}}) where {T, N, TArray} = Bro
     # Create the output as an InboundsArray
     similar(A, ElType, axes(bc))
 end
+# Special version to handle 0-d arrays, copied from Base.
+@inline copy(bc::Broadcast.Broadcasted{<:Broadcast.ArrayStyle{InboundsArray{T, 0, TArray}}} where {T, TArray}) = bc[CartesianIndex()]
 
 "`A = find_iba(As)` returns the first InboundsArray among the arguments."
 find_iba(bc::Base.Broadcast.Broadcasted) = find_iba(bc.args)

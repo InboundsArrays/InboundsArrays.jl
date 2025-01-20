@@ -40,7 +40,10 @@ end
 InboundsVector{T, TVector} = InboundsArray{T, 1, TVector} where {T, TVector}
 InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 
-import Base: getindex, setindex!, size, IndexStyle, length, similar, axes, BroadcastStyle, copyto!, resize!, unsafe_convert, strides, elsize
+import Base: getindex, setindex!, size, IndexStyle, length, similar, axes, BroadcastStyle,
+             copyto!, resize!, unsafe_convert, strides, elsize, view, maybeview
+
+InboundsArray(A::InboundsArray) = A
 
 function InboundsArray{T}(arg1, arg2, args...) where T
     return InboundsArray(Array{T}(arg1, arg2, args...))
@@ -167,8 +170,8 @@ end
     return elsize(a.a)
 end
 
-@inline function maybeview(a::AbstractInboundsArray, args...)
-    return InboundsArray(maybeview(a.a, args...))
+@inline function view(a::AbstractInboundsArray, I::Vararg{Any,M}) where M
+    return InboundsArray(view(a.a, I...))
 end
 
 end # module InboundsArrays

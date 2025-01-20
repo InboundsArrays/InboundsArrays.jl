@@ -3,6 +3,8 @@ module InboundsArraysTests
 using InboundsArrays
 using Test
 
+using LinearAlgebra
+
 # Import packages for extensions if possible
 try
     using MPI
@@ -11,6 +13,10 @@ end
 
 function isequal(args...)
     return isapprox(args...; rtol=0.0, atol=0.0)
+end
+
+function isclose(args...)
+    return isapprox(args...; rtol=1.0e-14, atol=0.0)
 end
 
 function runtests()
@@ -166,6 +172,67 @@ function runtests()
             @test size(d) == (3, 5)
 
             @test axes(a) == (1:2, 1:2, 1:2)
+        end
+
+        @testset "LinearAlgebra interface" begin
+            A = InboundsArray([1.0 2.0; 3.0 4.0])
+            B = InboundsArray([5.0 6.0; 7.0 8.0])
+            C = InboundsArray([9.0 10.0; 11.0 12.0])
+            x = InboundsArray([5.0, 7.0])
+            y = InboundsArray([6.0, 8.0])
+
+            mul!(y, A, x)
+            @test isequal(y, [19.0, 43.0])
+            @test y isa InboundsVector
+
+            z = A * x
+            @test isequal(z, [19.0, 43.0])
+            @test z isa InboundsVector
+
+            y .= [6.0, 8.0]
+            mul!(y, A, x, 2.0, 3.0)
+            @test isequal(y, [56.0, 110.0])
+            @test y isa InboundsVector
+
+            mul!(C, A, B)
+            @test isequal(C, [19.0 22.0; 43.0 50.0])
+            @test C isa InboundsMatrix
+
+            D = A * B
+            @test isequal(D, [19.0 22.0; 43.0 50.0])
+            @test D isa InboundsMatrix
+
+            C .= [9.0 10.0; 11.0 12.0]
+            mul!(C, A, B, 2.0, 3.0)
+            @test isequal(C, [65.0 74.0; 119.0 136.0])
+            @test C isa InboundsMatrix
+
+            Ax = InboundsArray([19.0, 43.0])
+            Alu = lu(A)
+            ldiv!(y, Alu, Ax)
+            @test isclose(y, x)
+            @test y isa InboundsVector
+
+            z = Alu \ Ax
+            @test isclose(z, x)
+            @test z isa InboundsVector
+
+            z = A \ Ax
+            @test isclose(z, x)
+            @test z isa InboundsVector
+
+            AB = InboundsArray([19.0 22.0; 43.0 50.0])
+            ldiv!(C, Alu, AB)
+            @test isclose(C, B)
+            @test C isa InboundsMatrix
+
+            D = Alu \ AB
+            @test isclose(D, B)
+            @test D isa InboundsMatrix
+
+            D = A \ AB
+            @test isclose(D, B)
+            @test D isa InboundsMatrix
         end
 
         mpiext = Base.get_extension(InboundsArrays, :MPIExt)

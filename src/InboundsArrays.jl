@@ -41,7 +41,7 @@ InboundsVector{T, TVector} = InboundsArray{T, 1, TVector} where {T, TVector}
 InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 
 import Base: getindex, setindex!, size, IndexStyle, length, similar, axes, BroadcastStyle,
-             copyto!, resize!, unsafe_convert, strides, elsize, view, maybeview
+             copyto!, copy, resize!, unsafe_convert, strides, elsize, view, maybeview
 
 InboundsArray(A::InboundsArray) = A
 

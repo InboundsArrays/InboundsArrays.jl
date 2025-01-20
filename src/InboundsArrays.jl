@@ -176,4 +176,6 @@ end
     return InboundsArray(view(a.a, I...))
 end
 
+include("LinearAlgebra_support.jl")
+
 end # module InboundsArrays

@@ -43,7 +43,8 @@ InboundsVector{T, TVector} = InboundsArray{T, 1, TVector} where {T, TVector}
 InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 
 import Base: getindex, setindex!, size, IndexStyle, length, similar, axes, BroadcastStyle,
-             copyto!, copy, resize!, unsafe_convert, strides, elsize, view, maybeview
+             copyto!, copy, resize!, unsafe_convert, strides, elsize, view, maybeview,
+             reshape
 
 InboundsArray(A::InboundsArray) = A
 
@@ -170,6 +171,10 @@ end
 @inline function resize!(a::InboundsVector, nl::Integer)
     resize!(a.a, nl)
     return a
+end
+
+@inline function reshape(a::AbstractInboundsArray, dims::Int64...)
+    return InboundsArray(reshape(a.a, dims...))
 end
 
 @inline function unsafe_convert(pt::Type{Ptr{T}}, a::InboundsArrays.InboundsArray{T, N, TArray}) where {T, N, TArray}

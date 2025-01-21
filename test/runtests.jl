@@ -184,6 +184,13 @@ function runtests()
 
             @test axes(a) == (1:2, 1:2, 1:2)
 
+            r = reshape(a, 4, 2)
+            @test r isa InboundsArray
+            @test size(r) == (4, 2)
+            v = vec(a)
+            @test v isa InboundsVector
+            @test size(v) == (8,)
+
             @test !isa(get_noninbounds(a), AbstractInboundsArray)
             @test !isa(get_noninbounds(zeros(3, 3, 3)), AbstractInboundsArray)
         end

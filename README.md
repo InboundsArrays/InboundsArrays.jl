@@ -68,8 +68,10 @@ Coverage
 --------
 
 At present, `InboundsArray` supports:
-* The `AbstractArray` interface and broadcasting (returning an `InboundsArray`)
+* `Base` functionality
+    * The `AbstractArray` interface and broadcasting (returning an `InboundsArray`)
     * Also any package that only requires the generic `AbstractArray` interface
+    * `reshape()` and `vec()`
 * `LinearAlgebra`
     * `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
 * `SparseArrays` and `SparseMatricesCSR`

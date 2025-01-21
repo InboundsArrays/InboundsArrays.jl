@@ -19,9 +19,54 @@ other array types is an InboundsArray (if the result is an array and not a scala
 in the example above is an `InboundsArray`.
 
 
-Testing
--------
+Testing - this is very IMPORTANT!
+---------------------------------
 
 As bounds checks (on array accesses) are disabled by default when using `InboundsArray`,
 you should make sure to test your package using `--check-bounds=yes`, which will restore
 the bounds checks.
+
+Status and development
+----------------------
+
+This package should be considered experimental. It can improve performance, but
+when it interacts with packages that support `AbstractArray`s, but have
+specialised, optimised implementations for `Array` we most likely have to
+include a wrapper in this package to make sure the `Array` implementation is
+used (see the [Coverage section below](#Coverage) for the current status).
+Therefore if an `InboundsArray` interacts with an unsupported (feature of a)
+package, it can dramatically decrease performance. Ideally you should benchmark
+each performance-critical function that you want to use, comparing `Array` and
+`InboundsArray` (or in general, the array type you would otherwise use, and
+`InboundsArray` wrapping that array type).
+
+Contributions are very, very welcome to extend support/coverage. This is often
+as simple as defining an `@inline` wrapper to pass the `a` field of the
+`InboundsArray` arguments (the wrapped array) to the standard implementation,
+for example
+```julia
+@inline function ldiv!(x::InboundsVector, Alu::Factorization, b::InboundsVector)
+    ldiv!(x.a, Alu, b.a)
+    return x
+end
+```
+and possibly re-wrapping the result when the function is not in-place
+```julia
+@inline function ldiv(Alu::Factorization, b::InboundsVector)
+    return InboundsArray(ldiv(Alu, b.a))
+end
+```
+
+Coverage
+--------
+
+At present, `InboundsArray` supports:
+* The `AbstractArray` interface and broadcasting (returning an `InboundsArray`)
+    * Also any package that only requires the generic `AbstractArray` interface
+* `LinearAlgebra`
+    * `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
+* `SparseArrays` and `SparseMatricesCSR`
+    * `sparse`/sparsecsr`, `convert`, `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
+* `MPI` is intended to support all functions by wrapping those listed, but has
+  not been comprehensively tested
+    * `Buffer`, `UBuffer`, `VBuffer`

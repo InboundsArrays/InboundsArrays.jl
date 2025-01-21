@@ -11,6 +11,10 @@ try
     using MPI
 catch
 end
+try
+    using FFTW
+catch
+end
 
 function isequal(args...)
     return isapprox(args...; rtol=0.0, atol=0.0)
@@ -22,7 +26,7 @@ end
 
 function runtests()
 
-    @testset "InboundsArrays" begin
+    @testset "InboundsArrays" verbose=true begin
         @testset "InboundsVector" begin
             a = InboundsVector([1.0, 2.0, 3.0, 4.0])
             b = InboundsVector([5.0, 6.0, 7.0, 8.0])
@@ -439,6 +443,23 @@ function runtests()
             mul!(sC, sA, sB, 2.0, 3.0)
             @test isequal(sC, [65.0 74.0; 119.0 136.0])
             @test sC isa InboundsSparseMatrixCSR
+        end
+
+        fftwext = Base.get_extension(InboundsArrays, :FFTWExt)
+        if fftwext !== nothing
+            @testset "FFTWExt" begin
+                a = InboundsArray(ones(Complex{Float64}, 8))
+
+                forward_transform = plan_fft!(a, flags=FFTW.ESTIMATE)
+                backward_transform = plan_ifft!(a, flags=FFTW.ESTIMATE)
+
+                @. a = sin(2.0 * π * (0.0:7.0) / 8)
+                a_fft = forward_transform * copy(a)
+                @test a_fft isa InboundsVector
+                a_reconstructed = backward_transform * a_fft
+                @test a_reconstructed isa InboundsVector
+                @test isclose(a_reconstructed, a)
+            end
         end
 
         mpiext = Base.get_extension(InboundsArrays, :MPIExt)

@@ -65,6 +65,9 @@ function runtests()
             @test size(d) == (3, 5)
 
             @test axes(a) == (1:4,)
+
+            @test !isa(get_noninbounds(a), AbstractInboundsArray)
+            @test !isa(get_noninbounds(zeros(3)), AbstractInboundsArray)
         end
 
         @testset "InboundsMatrix" begin
@@ -117,6 +120,9 @@ function runtests()
             @test size(d) == (3, 5, 6)
 
             @test axes(a) == (1:2, 1:2)
+
+            @test !isa(get_noninbounds(a), AbstractInboundsArray)
+            @test !isa(get_noninbounds(zeros(3, 3)), AbstractInboundsArray)
         end
 
         @testset "InboundsArray" begin
@@ -173,6 +179,9 @@ function runtests()
             @test size(d) == (3, 5)
 
             @test axes(a) == (1:2, 1:2, 1:2)
+
+            @test !isa(get_noninbounds(a), AbstractInboundsArray)
+            @test !isa(get_noninbounds(zeros(3, 3, 3)), AbstractInboundsArray)
         end
 
         @testset "LinearAlgebra interface" begin

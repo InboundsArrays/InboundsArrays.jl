@@ -18,6 +18,12 @@ Broadcasting is implemented so that the result of broadcasting an InboundsArray 
 other array types is an InboundsArray (if the result is an array and not a scalar). So `c`
 in the example above is an `InboundsArray`.
 
+To get the wrapped, non-inbounds array back from an `InboundsArray` use
+```julia
+a_noninbounds = get_noninbounds(a)
+```
+`get_noninbouds()` is a no-op on anything other than an `InboundsArray`.
+
 
 Testing - this is very IMPORTANT!
 ---------------------------------
@@ -25,6 +31,7 @@ Testing - this is very IMPORTANT!
 As bounds checks (on array accesses) are disabled by default when using `InboundsArray`,
 you should make sure to test your package using `--check-bounds=yes`, which will restore
 the bounds checks.
+
 
 Status and development
 ----------------------

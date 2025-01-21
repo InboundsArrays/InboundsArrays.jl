@@ -30,7 +30,8 @@ the bounds checks.
 module InboundsArrays
 
 export InboundsArray, InboundsVector, InboundsMatrix, AbstractInboundsArray,
-       InboundsSparseMatrixCSC, InboundsSparseVector, InboundsSparseMatrixCSR
+       InboundsSparseMatrixCSC, InboundsSparseVector, InboundsSparseMatrixCSR,
+       get_noninbounds
 
 abstract type AbstractInboundsArray{T, N} <: AbstractArray{T, N} end
 
@@ -77,6 +78,16 @@ end
 function InboundsMatrix{T, TMatrix}(arg1, arg2, arg3) where {T, TMatrix}
     return InboundsMatrix(TMatrix(arg1, arg2, arg3))
 end
+
+"""
+    get_noninbounds(A)
+
+If `A` is an `InboundsArray{T, N, TArray}`, returns the wrapped array of type `TArray`,
+otherwise returns `A` unchanged.
+"""
+function get_noninbounds end
+@inline get_noninbounds(A::AbstractInboundsArray) = A.a
+@inline get_noninbounds(A) = A
 
 @inline function getindex(A::AbstractInboundsArray, args...)
     return @inbounds getindex(A.a, args...)

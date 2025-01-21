@@ -73,7 +73,9 @@ At present, `InboundsArray` supports:
 * `LinearAlgebra`
     * `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
 * `SparseArrays` and `SparseMatricesCSR`
-    * `sparse`/sparsecsr`, `convert`, `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
+    * `sparse`/`sparsecsr`, `convert`, `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
 * `MPI` is intended to support all functions by wrapping those listed, but has
   not been comprehensively tested
     * `Buffer`, `UBuffer`, `VBuffer`
+* `FFTW`
+    * `plan_fft!`, `plan_ifft!`, `*`

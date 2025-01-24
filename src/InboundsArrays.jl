@@ -46,7 +46,11 @@ import Base: getindex, setindex!, size, IndexStyle, length, similar, axes, Broad
              copyto!, copy, resize!, unsafe_convert, strides, elsize, view, maybeview,
              reshape
 
-InboundsArray(A::InboundsArray) = A
+@inline InboundsArray(A::InboundsArray) = A
+
+# This version handles any scalar `A`, because the default constructor for the `struct`
+# defines a more-specific method for any `A` that is an `AbstractArray`
+@inline InboundsArray(A) = A
 
 function InboundsArray{T}(arg1, arg2, args...) where T
     return InboundsArray(Array{T}(arg1, arg2, args...))
@@ -91,7 +95,7 @@ function get_noninbounds end
 @inline get_noninbounds(A) = A
 
 @inline function getindex(A::AbstractInboundsArray, args...)
-    return @inbounds getindex(A.a, args...)
+    return @inbounds InboundsArray(getindex(A.a, args...))
 end
 
 @inline function setindex!(A::AbstractInboundsArray, v, i::Int)

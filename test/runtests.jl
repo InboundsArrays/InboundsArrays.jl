@@ -72,6 +72,8 @@ function runtests()
 
             @test !isa(get_noninbounds(a), AbstractInboundsArray)
             @test !isa(get_noninbounds(zeros(3)), AbstractInboundsArray)
+
+            @test a[1:3] isa InboundsVector{Float64, Vector{Float64}}
         end
 
         @testset "InboundsMatrix" begin
@@ -127,6 +129,9 @@ function runtests()
 
             @test !isa(get_noninbounds(a), AbstractInboundsArray)
             @test !isa(get_noninbounds(zeros(3, 3)), AbstractInboundsArray)
+
+            @test a[1:1, :] isa InboundsMatrix{Float64, Matrix{Float64}}
+            @test a[:, 1:1] isa InboundsMatrix{Float64, Matrix{Float64}}
         end
 
         @testset "InboundsArray" begin
@@ -193,6 +198,10 @@ function runtests()
 
             @test !isa(get_noninbounds(a), AbstractInboundsArray)
             @test !isa(get_noninbounds(zeros(3, 3, 3)), AbstractInboundsArray)
+
+            @test a[1:1, :, :] isa InboundsArray{Float64, 3, Array{Float64, 3}}
+            @test a[:, 1:1, :] isa InboundsArray{Float64, 3, Array{Float64, 3}}
+            @test a[:, :, 1:1] isa InboundsArray{Float64, 3, Array{Float64, 3}}
         end
 
         @testset "LinearAlgebra interface" begin

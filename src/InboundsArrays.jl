@@ -35,11 +35,60 @@ export InboundsArray, InboundsVector, InboundsMatrix, AbstractInboundsArray,
 
 abstract type AbstractInboundsArray{T, N} <: AbstractArray{T, N} end
 
+"""
+    InboundsArray{T, N, TArray <: AbstractArray{T, N}} <: AbstractInboundsArray{T, N}
+
+Wrapper array type that disables bounds checks for array accesses, but otherwise forwards
+all calls to the wrapped `TArray` array.
+
+Bounds checks can be enabled for testing by running Julia with `--check-bounds=yes`.
+
+Construct with one of:
+* `InboundsArray(A::AbstractArray)`
+    Creates an `InboundsArray` that wraps `A`.
+* `InboundsArray{T}(initializer, dims...)`
+    Creates an `InboundsArray` wrapping an `Array{T}(initializer, dims...)`.
+* `InboundsArray{T, N, TArray}(initializer, dims...)`
+    Creates an `InboundsArray` wrapping a `TArray(initializer, dims)` where `TArray <: AbstractArray{T, N}`.
+"""
 struct InboundsArray{T, N, TArray <: AbstractArray{T, N}} <: AbstractInboundsArray{T, N}
     a::TArray
 end
 
+"""
+    InboundsVector{T, TVector <: AbstractVector{T}} <: AbstractInboundsArray{T, 1}
+
+Wrapper vector type that disables bounds checks for array accesses, but otherwise forwards
+all calls to the wrapped `TVector` array.
+
+Bounds checks can be enabled for testing by running Julia with `--check-bounds=yes`.
+
+Construct with one of:
+* `InboundsVector(V::AbstractVector)`
+    Creates an `InboundsVector` that wraps `V`.
+* `InboundsVector{T}(initializer, n)`
+    Creates an `InboundsVector` wrapping a `Vector{T}(initializer, n)`.
+* `InboundsVector{T, TVector}(initializer, n)`
+    Creates an `InboundsVector` wrapping a `TVector(initializer, n)` where `TVector <: AbstractVector{T}`.
+"""
 InboundsVector{T, TVector} = InboundsArray{T, 1, TVector} where {T, TVector}
+
+"""
+    InboundsMatrix{T, TMatrix <: AbstractMatrix{T}} <: AbstractInboundsArray{T, 2}
+
+Wrapper matrix type that disables bounds checks for array accesses, but otherwise forwards
+all calls to the wrapped `TMatrix` array.
+
+Bounds checks can be enabled for testing by running Julia with `--check-bounds=yes`.
+
+Construct with one of:
+* `InboundsMatrix(M::AbstractMatrix)`
+    Creates an `InboundsMatrix` that wraps `M`.
+* `InboundsMatrix{T}(initializer, m, n)`
+    Creates an `InboundsMatrix` wrapping a `Matrix{T}(initializer, m, n)`.
+* `InboundsMatrix{T, TMatrix}(initializer, n)`
+    Creates an `InboundsMatrix` wrapping a `TMatrix(initializer, m, n)` where `TMatrix <: AbstractMatrix{T}`.
+"""
 InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 
 import Base: getindex, setindex!, size, IndexStyle, length, similar, axes, BroadcastStyle,

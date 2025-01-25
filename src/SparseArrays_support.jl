@@ -3,7 +3,7 @@
 export InboundsSparseMatrixCSC, InboundsSparseVector, InboundsSparseMatrixCSR
 
 import Base: convert, copy, *
-import LinearAlgebra: lu, lu!, mul!
+import LinearAlgebra: lu, lu!, mul!, Factorization
 import SparseArrays: AbstractSparseMatrix, AbstractSparseMatrixCSC, SparseMatrixCSC,
                      AbstractCompressedVector, SparseVector, sparse, getcolptr, rowvals,
                      nonzeros, nonzeroinds

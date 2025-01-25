@@ -32,6 +32,47 @@ As bounds checks (on array accesses) are disabled by default when using `Inbound
 you should make sure to test your package using `--check-bounds=yes`, which will restore
 the bounds checks.
 
+`MethodError` no method matching `InboundsArray`/`InboundsVector`/`InboundsMatrix`
+----------------------------------------------------------------------------------
+
+Many packages (e.g. LinearAlgebra, etc.) support `AbstractArray` objects but
+have specialized, more optimized methods for specific array types (e.g.
+`Array`, `SparseMatrixCSC`, etc.). An `InboundsArray` is a wrapper around an
+array of some type `TArray`. To achieve best performance, we should avoid the
+`AbstractArray` interface and instead pass the wrapped `TArray` to the package
+(the package authors should take care of using `@inbounds` anywhere it is
+needed, so there should be no performance benefit to passing an `InboundsArray`
+to a dependency package - unless perhaps that dependency explicitly supports or
+requires `InboundsArray`). Doing this pass-through requires a method to be
+defined that takes an `InboundsArray` argument or arguments, and calls the
+standard version of the function using the wrapped array, passing through any
+extra non-`InboundsArray` arguments. `InboundsArrays` provides many of these
+pass-through methods for commonly used packages/functions (if you need more,
+please open a PR - they are generally short to write!).
+
+In order to guarantee the best performance possible, by default
+`InboundsArrays` is defined so that there will be an error if an
+`InboundsArray` is passed to an unsupported function. This is achieved by not
+making `AbstractInboundsArray` a subtype of `AbstractArray`, so that a
+`MethodError()` will be throw if an `InboundsArray` is passed to a function
+that accepts an `AbstractArray`. In other words, we error rather than risking
+poor performance. If you know that all performance-critical functions are
+supported correctly, but there are some other functions that are not supported,
+or if you know that the `AbstractArray` interface provides optimal performance
+for any unsupported functions, it might be convenient for `InboundsArray` to be
+a subtype of `AbstractArray`. This can be achieved by calling
+```julia
+InboundsArrays.set_inherit_from_AbstractArray(true)
+```
+This setting will be saved in `LocalPreferences.toml` and so will persist. Call
+again with no argument (or `false`) to reset to the default. After changing the
+setting you must restart Julia and recompile any system images that include
+`InboundsArrays` in order for the change to take effect.
+
+If you use `set_inherit_from_AbstractArray = true`, you are responsible for
+ensuring that there are no significant slow-downs from using `InboundsArray`
+instead of the array type that you would otherwise have used! It is preferred
+to add support for whatever functions you need to `InboundsArrays.jl`.
 
 Status and development
 ----------------------
@@ -69,9 +110,12 @@ Coverage
 
 At present, `InboundsArray` supports:
 * `Base` functionality
-    * The `AbstractArray` interface and broadcasting (returning an `InboundsArray`)
-    * Also any package that only requires the generic `AbstractArray` interface
+    * `getindex()`, `setindex!()`, `length()`, `size()`, `axes()`, `similar()`.
+    * Broadcasting
     * `reshape()` and `vec()`
+    * If inheriting from `AbstractArray` is enabled:
+        * The `AbstractArray` interface and broadcasting (returning an `InboundsArray`)
+        * Also any package that only requires the generic `AbstractArray` interface
 * `LinearAlgebra`
     * `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
 * `SparseArrays` and `SparseMatricesCSR`

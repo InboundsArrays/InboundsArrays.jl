@@ -33,7 +33,41 @@ export InboundsArray, InboundsVector, InboundsMatrix, AbstractInboundsArray,
        InboundsSparseMatrixCSC, InboundsSparseVector, InboundsSparseMatrixCSR,
        get_noninbounds
 
-abstract type AbstractInboundsArray{T, N} <: AbstractArray{T, N} end
+using Preferences
+
+const default_inherit_from_AbstractArray = false
+const inherit_from_AbstractArray = @load_preference("inherit_from_AbstractArray", default_inherit_from_AbstractArray)
+
+"""
+    set_inherit_from_AbstractArray(value::Bool=$default_inherit_from_AbstractArray)
+
+Set `inherit_from_AbstractArray`. By default, when this is set to `false`, `InboundsArray`
+does not inherit from `AbstractArray`. This should be safer, as situations that would
+result in degraded performance due to using an `AbstractArray` implementation rather than
+a more specific, optimized one (e.g. for `Array`) should error rather than running slowly.
+When this happens, a wrapper function should be added to `InboundsArrays.jl` to provide an
+`InboundsArray` interface for the function in question, that passes in the wrapped array
+rather than the `InboundsArray`. To work without errors, but with the risk of slow
+execution in unsupported cases, call
+```julia
+InboundsArrays.set_inherit_from_AbstractArray(true)
+```
+This setting will be saved in `LocalPreferences.toml` and so will persist. Call again with
+no argument (or `false`) to reset to the default.
+
+After calling this function, restart Julia (and recompile any system images that include
+`InboundsArrays`) in order for the setting to take effect.
+"""
+function set_inherit_from_AbstractArray(value::Bool=default_inherit_from_AbstractArray)
+    @set_preferences!("inherit_from_AbstractArray" => value)
+    @info "`inherit_from_AbstractArray = $value` is set. Restart Julia for it to take effect."
+end
+
+if inherit_from_AbstractArray
+    abstract type AbstractInboundsArray{T, N} <: AbstractArray{T, N} end
+else
+    abstract type AbstractInboundsArray{T, N} end
+end
 
 """
     InboundsArray{T, N, TArray <: AbstractArray{T, N}} <: AbstractInboundsArray{T, N}
@@ -93,7 +127,8 @@ InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 
 import Base: getindex, setindex!, size, IndexStyle, length, similar, axes, BroadcastStyle,
              copyto!, copy, resize!, unsafe_convert, strides, elsize, view, maybeview,
-             reshape
+             reshape, isapprox, iterate, eachindex, broadcastable, vec, *, adjoint,
+             lastindex, isassigned
 
 @inline InboundsArray(A::InboundsArray) = A
 
@@ -159,8 +194,8 @@ end
     return @inbounds setindex!(A.a, X, I...)
 end
 
-@inline function size(A::AbstractInboundsArray)
-    return size(A.a)
+@inline function size(A::AbstractInboundsArray, args...)
+    return size(A.a, args...)
 end
 
 @inline function IndexStyle(::InboundsArray{T, N, TArray}) where {T, N, TArray}
@@ -197,16 +232,17 @@ end
 
 # Define these so that a broadcast operations with an InboundsArray return an
 # InboundsArray - see https://docs.julialang.org/en/v1/manual/interfaces/#Selecting-an-appropriate-output-array
-BroadcastStyle(::Type{<:InboundsArray{T, N, TArray}}) where {T, N, TArray} = Broadcast.ArrayStyle{InboundsArray{T, N, TArray}}()
+struct InboundsArrayStyle{A<:AbstractInboundsArray} <: Broadcast.AbstractArrayStyle{Any} end
+BroadcastStyle(::Type{<:InboundsArray{T, N, TArray}}) where {T, N, TArray} = InboundsArrayStyle{InboundsArray{T, N, TArray}}()
 
-@inline function similar(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{InboundsArray{T, N, TArray}}}, ::Type{ElType}) where {T, N, TArray, ElType}
+@inline function similar(bc::Broadcast.Broadcasted{InboundsArrayStyle{InboundsArray{T, N, TArray}}}, ::Type{ElType}) where {T, N, TArray, ElType}
     # Scan the inputs for the InboundsArray:
     A = find_iba(bc)
     # Create the output as an InboundsArray
     similar(A, ElType, axes(bc))
 end
 # Special version to handle 0-d arrays, copied from Base.
-@inline copy(bc::Broadcast.Broadcasted{<:Broadcast.ArrayStyle{InboundsArray{T, 0, TArray}}} where {T, TArray}) = bc[CartesianIndex()]
+@inline copy(bc::Broadcast.Broadcasted{<:InboundsArrayStyle{InboundsArray{T, 0, TArray}}} where {T, TArray}) = bc[CartesianIndex()]
 
 "`A = find_iba(As)` returns the first InboundsArray among the arguments."
 find_iba(bc::Base.Broadcast.Broadcasted) = find_iba(bc.args)
@@ -216,7 +252,7 @@ find_iba(::Tuple{}) = nothing
 find_iba(a::InboundsArray, rest) = a
 find_iba(::Any, rest) = find_iba(rest)
 
-@inline function copyto!(A::InboundsArray, bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{InboundsArray{T, N, TArray}}}) where {T, N, TArray}
+@inline function copyto!(A::InboundsArray, bc::Broadcast.Broadcasted{InboundsArrayStyle{InboundsArray{T, N, TArray}}}) where {T, N, TArray}
     @inbounds copyto!(A.a, bc)
     return A
 end
@@ -244,6 +280,78 @@ end
 
 @inline function view(a::AbstractInboundsArray, I::Vararg{Any,M}) where M
     return InboundsArray(view(a.a, I...))
+end
+
+@inline function *(A::InboundsArray{TA, NA, TArrayA}, x::AbstractArray{Tx, Nx}) where {TA, NA, TArrayA, Tx, Nx}
+    return InboundsArray(A.a * x)
+end
+@inline function *(A::AbstractMatrix{TA}, x::InboundsArray{Tx, Nx, TArrayx}) where {TA, Tx, Nx, TArrayx}
+    return InboundsArray(A * x.a)
+end
+@inline function *(A::InboundsArray{Tm, 2, TArrayA}, x::InboundsArray{Tx, Nx, TArrayx}) where {Tm, TArrayA, Tx, Nx, TArrayx}
+    return InboundsArray(A.a * x.a)
+end
+
+if !inherit_from_AbstractArray
+    @inline function copy(A::InboundsArray)
+        return InboundsArray(@inbounds copy(A.a))
+    end
+    @inline function copyto!(A::AbstractInboundsArray, B::AbstractArray)
+        return @inbounds copyto!(A.a, B)
+    end
+    @inline function copyto!(A::AbstractInboundsArray, bc::Broadcast.Broadcasted)
+        @inbounds copyto!(A.a, bc)
+        return A
+    end
+    @inline vec(A::AbstractInboundsArray) = reshape(A, length(A))
+    @inline adjoint(A::InboundsArray) = InboundsArray(adjoint(A.a))
+    @inline lastindex(A::AbstractInboundsArray, args...) = lastindex(A.a, args...)
+    @inline isassigned(A::AbstractInboundsArray, args...) = isassigned(A.a, args...)
+
+    # Copied from the AbstractArray implementation in base/abstractaray.jl
+    similar(a::AbstractInboundsArray{T}) where {T} = similar(a, T)
+    similar(a::AbstractInboundsArray, ::Type{T}) where {T} = similar(a, T, Base.to_shape(axes(a)))
+    similar(a::AbstractInboundsArray{T}, dims::Tuple) where {T} = similar(a, T, Base.to_shape(dims))
+    similar(a::AbstractInboundsArray{T}, dims::Base.DimOrInd...) where {T} = similar(a, T, Base.to_shape(dims))
+    similar(a::AbstractInboundsArray, ::Type{T}, dims::Base.DimOrInd...) where {T} = similar(a, T, Base.to_shape(dims))
+    similar(a::AbstractInboundsArray, ::Type{T}, dims::Tuple{Union{Integer, Base.OneTo}, Vararg{Union{Integer, Base.OneTo}}}) where {T} = similar(a, T, Base.to_shape(dims))
+    function iterate(A::AbstractInboundsArray, state=(eachindex(A),))
+        y = iterate(state...)
+        y === nothing && return nothing
+        A[y[1]], (state[1], Base.tail(y)...)
+    end
+    axes1(A::AbstractInboundsArray{<:Any,0}) = Base.OneTo(1)
+    axes1(A::AbstractInboundsArray) = (@inline; axes(A)[1])
+    axes1(iter) = Base.oneto(length(iter))
+    eachindex(A::AbstractInboundsArray) = (@inline(); eachindex(IndexStyle(A), A))
+    function eachindex(A::AbstractInboundsArray, B::AbstractInboundsArray)
+        @inline
+        eachindex(IndexStyle(A,B), A, B)
+    end
+    function eachindex(A::AbstractInboundsArray, B::AbstractInboundsArray...)
+        @inline
+        eachindex(IndexStyle(A,B...), A, B...)
+    end
+    eachindex(::IndexLinear, A::AbstractInboundsArray) = (@inline; Base.oneto(length(A)))
+    eachindex(::IndexLinear, A::AbstractInboundsArray{T, 1} where {T}) = (@inline; axes1(A))
+    function eachindex(::IndexLinear, A::AbstractInboundsArray, B::AbstractInboundsArray...)
+        @inline
+        indsA = eachindex(IndexLinear(), A)
+        Base._all_match_first(X->eachindex(IndexLinear(), X), indsA, B...) ||
+            throw_eachindex_mismatch_indices(IndexLinear(), eachindex(A), eachindex.(B)...)
+        indsA
+    end
+    broadcastable(x::AbstractInboundsArray) = x
+
+    @inline function isapprox(x::AbstractInboundsArray, y; kwargs...)
+        return isapprox(x.a, y; kwargs...)
+    end
+    @inline function isapprox(x, y::AbstractInboundsArray; kwargs...)
+        return isapprox(x, y.a; kwargs...)
+    end
+    @inline function isapprox(x::AbstractInboundsArray, y::AbstractInboundsArray; kwargs...)
+        return isapprox(x.a, y.a; kwargs...)
+    end
 end
 
 include("LinearAlgebra_support.jl")

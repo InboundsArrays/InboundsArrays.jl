@@ -2,7 +2,7 @@
 
 export InboundsSparseMatrixCSC, InboundsSparseVector, InboundsSparseMatrixCSR
 
-import Base: convert, copy, *
+import Base: convert, copy, *, \
 import LinearAlgebra: lu, lu!, mul!, Factorization
 import SparseArrays: AbstractSparseMatrix, AbstractSparseMatrixCSC, SparseMatrixCSC,
                      AbstractCompressedVector, SparseVector, sparse, getcolptr, rowvals,
@@ -76,6 +76,16 @@ function copy(m::InboundsSparseMatrixCSC{Tv, Ti}) where {Tv, Ti}
 end
 
 @inline sparse(m::InboundsSparseMatrixCSC) = copy(m)
+
+if !inherit_from_AbstractArray
+    @inline sparse(m::InboundsMatrix) = InboundsSparseMatrixCSC(sparse(m.a))
+    @inline function \(A::InboundsSparseMatrixCSC, x::AbstractArray)
+        return InboundsArray(A.parent \ x)
+    end
+    @inline function \(A::InboundsSparseMatrixCSC, x::InboundsArray)
+        return InboundsArray(A.parent \ x.a)
+    end
+end
 
 """
 Equivalent of SparseVector, but using InboundsVector for storage
@@ -230,8 +240,32 @@ end
     mul!(C.a, A.parent, B.a, α, β)
     return C
 end
+@inline function mul!(C::InboundsSparseMatrixCSC, A::InboundsSparseMatrixCSC, B::InboundsMatrix, α::Number, β::Number)
+    mul!(C.parent, A.parent, B.a, α, β)
+    return C
+end
+@inline function mul!(C::InboundsMatrix, A::InboundsSparseMatrixCSC, B::InboundsSparseMatrixCSC, α::Number, β::Number)
+    mul!(C.a, A.parent, B.parent, α, β)
+    return C
+end
+@inline function mul!(C::InboundsSparseMatrixCSC, A::InboundsSparseMatrixCSC, B::InboundsSparseMatrixCSC, α::Number, β::Number)
+    mul!(C.parent, A.parent, B.parent, α, β)
+    return C
+end
 @inline function mul!(C::InboundsVector, A::InboundsSparseMatrixCSC, B::InboundsVector, α::Number, β::Number)
     mul!(C.a, A.parent, B.a, α, β)
+    return C
+end
+@inline function mul!(C::InboundsSparseVector, A::InboundsSparseMatrixCSC, B::InboundsVector, α::Number, β::Number)
+    mul!(C.parent, A.parent, B.a, α, β)
+    return C
+end
+@inline function mul!(C::InboundsVector, A::InboundsSparseMatrixCSC, B::InboundsSparseVector, α::Number, β::Number)
+    mul!(C.a, A.parent, B.parent, α, β)
+    return C
+end
+@inline function mul!(C::InboundsSparseVector, A::InboundsSparseMatrixCSC, B::InboundsSparseVector, α::Number, β::Number)
+    mul!(C.parent, A.parent, B.parent, α, β)
     return C
 end
 @inline function lu(m::InboundsSparseMatrixCSR{Bi, Tv, Ti} where {Bi, Tv, Ti})

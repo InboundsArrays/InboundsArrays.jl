@@ -125,11 +125,11 @@ Construct with one of:
 """
 InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 
-import Base: getindex, setindex!, size, IndexStyle, length, similar, axes, BroadcastStyle,
-             copyto!, copy, resize!, unsafe_convert, strides, elsize, view, maybeview,
-             reshape, isapprox, iterate, eachindex, broadcastable, vec, *, adjoint,
-             lastindex, isassigned, reverse!, reverse, push!, pop!, sum, prod, maximum,
-             minimum, all, any, extrema
+import Base: getindex, setindex!, size, IndexStyle, length, ndims, similar, axes,
+             BroadcastStyle, copyto!, copy, resize!, unsafe_convert, strides, elsize,
+             view, maybeview, reshape, isapprox, iterate, eachindex, broadcastable, vec,
+             *, adjoint, lastindex, isassigned, reverse!, reverse, push!, pop!, sum, prod,
+             maximum, minimum, all, any, extrema
 
 @inline InboundsArray(A::InboundsArray) = A
 
@@ -206,6 +206,8 @@ end
 @inline function length(A::AbstractInboundsArray)
     return length(A.a)
 end
+
+@inline ndims(A::AbstractInboundsArray{T, N}) where {T, N} = N
 
 @inline function similar(A::InboundsArray)
     return InboundsArray(similar(A.a))

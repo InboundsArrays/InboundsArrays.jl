@@ -195,6 +195,11 @@ function runtests()
             @test c isa InboundsArray
             @test isequal(c, [8.0 10.0; 12.0 14.0;;; 8.0 10.0; 12.0 14.0])
 
+            c .= 0.0
+            @. c[:, 1, 1] = a[:, 1, 1] + 2
+            @test c isa InboundsArray
+            @test isequal(c, [8.0 0.0; 12.0 0.0;;; 0.0 0.0; 0.0 0.0])
+
             d = similar(a)
             @test d isa InboundsArray{Float64, 3, Array{Float64, 3}}
             @test size(d) == (2, 2, 2)

@@ -128,10 +128,10 @@ InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 import Base: getindex, setindex!, size, IndexStyle, length, ndims, similar, axes,
              BroadcastStyle, copyto!, copy, resize!, unsafe_convert, strides, elsize,
              view, maybeview, reshape, isapprox, iterate, eachindex, broadcastable, vec,
-             *, adjoint, lastindex, isassigned, reverse!, reverse, push!, pop!, sum, prod,
-             maximum, minimum, all, any, extrema, searchsorted, searchsortedfirst,
-             searchsortedlast, findfirst, findlast, findnext, findprev, findall, findmax,
-             findmin, findmax!, findmin!
+             *, adjoint, transpose, inv, lastindex, isassigned, reverse!, reverse, push!,
+             pop!, sum, prod, maximum, minimum, all, any, extrema, searchsorted,
+             searchsortedfirst, searchsortedlast, findfirst, findlast, findnext, findprev,
+             findall, findmax, findmin, findmax!, findmin!
 
 @inline InboundsArray(A::InboundsArray) = A
 
@@ -319,6 +319,10 @@ end
     return pop!(v.a, args...)
 end
 
+@inline adjoint(A::InboundsArray) = InboundsArray(adjoint(A.a))
+@inline transpose(A::InboundsArray) = InboundsArray(transpose(A.a))
+@inline inv(A::InboundsArray) = InboundsArray(inv(A.a))
+
 if !inherit_from_AbstractArray
     @inline function copy(A::InboundsArray)
         return InboundsArray(@inbounds copy(A.a))
@@ -331,7 +335,6 @@ if !inherit_from_AbstractArray
         return A
     end
     @inline vec(A::AbstractInboundsArray) = reshape(A, length(A))
-    @inline adjoint(A::InboundsArray) = InboundsArray(adjoint(A.a))
     @inline lastindex(A::AbstractInboundsArray, args...) = lastindex(A.a, args...)
     @inline isassigned(A::AbstractInboundsArray, args...) = isassigned(A.a, args...)
 

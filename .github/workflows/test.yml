@@ -25,7 +25,7 @@ jobs:
           version: '${{ matrix.julia_version }}'
       - uses: julia-actions/cache@v2
       - run: |
-          julia --project -e 'import Pkg; Pkg.add(["FFTW", "MPI"])'
+          julia --project -e 'import Pkg; Pkg.add(["FFTW", "HDF5", "MPI"])'
         shell: bash
       - uses: julia-actions/julia-buildpkg@v1
       - run: |
@@ -51,7 +51,7 @@ jobs:
           version: '${{ matrix.julia_version }}'
       - uses: julia-actions/cache@v2
       - run: |
-          julia --project -e 'import Pkg; Pkg.add(["FFTW", "MPI"])'
+          julia --project -e 'import Pkg; Pkg.add(["FFTW", "HDF5", "MPI"])'
         shell: bash
       - uses: julia-actions/julia-buildpkg@v1
       - run: |

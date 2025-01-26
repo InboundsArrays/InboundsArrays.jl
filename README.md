@@ -112,7 +112,7 @@ At present, `InboundsArray` supports:
 * `Base` functionality
     * `getindex()`, `setindex!()`, `length()`, `size()`, `ndims()`, `axes()`, `similar()`.
     * Broadcasting
-    * `reshape()` and `vec()`
+    * `reshape()`, `vec()`, `selectdim()`
     * `reverse!()`, `reverse()`, `push!()`, `pop!()`
     * `sum()`, `prod()`, `maximum()`, `minimum()`, `extrema()`, `all()`, `any()`
     * `adjoint()`, `transpose()`, `inv()`

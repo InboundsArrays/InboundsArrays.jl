@@ -570,6 +570,15 @@ function runtests()
                 a_reconstructed = backward_transform * a_fft
                 @test a_reconstructed isa InboundsVector
                 @test isclose(a_reconstructed, a)
+
+                b = InboundsArray(ones(8))
+                r2r = FFTW.plan_r2r!(b, FFTW.REDFT00)
+
+                @. b = cos(π * (0.0:7.0) / 7)
+                b_fft = r2r * copy(b)
+                @test b_fft isa InboundsVector
+                println("b_fft ", b_fft)
+                @test isclose(b_fft, [0.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
             end
         end
 

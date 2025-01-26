@@ -129,7 +129,9 @@ import Base: getindex, setindex!, size, IndexStyle, length, ndims, similar, axes
              BroadcastStyle, copyto!, copy, resize!, unsafe_convert, strides, elsize,
              view, maybeview, reshape, isapprox, iterate, eachindex, broadcastable, vec,
              *, adjoint, lastindex, isassigned, reverse!, reverse, push!, pop!, sum, prod,
-             maximum, minimum, all, any, extrema
+             maximum, minimum, all, any, extrema, searchsorted, searchsortedfirst,
+             searchsortedlast, findfirst, findlast, findnext, findprev, findall, findmax,
+             findmin, findmax!, findmin!
 
 @inline InboundsArray(A::InboundsArray) = A
 
@@ -385,6 +387,31 @@ if !inherit_from_AbstractArray
     @inline extrema(A::AbstractInboundsArray, args...; kwargs...) = extrema(A.a, args...; kwargs...)
     @inline all(A::AbstractInboundsArray, args...; kwargs...) = all(A.a, args...; kwargs...)
     @inline any(A::AbstractInboundsArray, args...; kwargs...) = any(A.a, args...; kwargs...)
+    @inline searchsorted(v::AbstractInboundsArray, x; kwargs...) = searchsorted(v.a, x; kwargs...)
+    @inline searchsortedfirst(A::AbstractInboundsArray, args...; kwargs...) = searchsortedfirst(A.a, args...; kwargs...)
+    @inline searchsortedlast(A::AbstractInboundsArray, args...; kwargs...) = searchsortedlast(A.a, args...; kwargs...)
+    @inline findfirst(A::AbstractInboundsArray) = findfirst(A.a)
+    @inline findfirst(p::Function, A::AbstractInboundsArray, args...; kwargs...) = findfirst(p, A.a, args...; kwargs...)
+    @inline findfirst(p::AbstractInboundsArray, A::AbstractInboundsArray, args...; kwargs...) = findfirst(p.a, A.a, args...; kwargs...)
+    @inline findfirst(p, A::AbstractInboundsArray, args...; kwargs...) = findfirst(p, A.a, args...; kwargs...)
+    @inline findlast(A::AbstractInboundsArray) = findlast(A.a)
+    @inline findlast(p::Function, A::AbstractInboundsArray, args...; kwargs...) = findlast(p, A.a, args...; kwargs...)
+    @inline findlast(p::AbstractInboundsArray, A::AbstractInboundsArray, args...; kwargs...) = findlast(p.a, A.a, args...; kwargs...)
+    @inline findlast(p, A::AbstractInboundsArray, args...; kwargs...) = findlast(p, A.a, args...; kwargs...)
+    @inline findnext(A::AbstractInboundsArray, i) = findnext(A.a, i)
+    @inline findnext(p::Function, A::AbstractInboundsArray, args...; kwargs...) = findnext(p, A.a, args...; kwargs...)
+    @inline findnext(p::AbstractInboundsArray, A::AbstractInboundsArray, args...; kwargs...) = findnext(p.a, A.a, args...; kwargs...)
+    @inline findnext(p, A::AbstractInboundsArray, args...; kwargs...) = findnext(p, A.a, args...; kwargs...)
+    @inline findprev(A::AbstractInboundsArray, i) = findprev(A.a, i)
+    @inline findprev(p::Function, A::AbstractInboundsArray, args...; kwargs...) = findprev(p, A.a, args...; kwargs...)
+    @inline findprev(p::AbstractInboundsArray, A::AbstractInboundsArray, args...; kwargs...) = findprev(p.a, A.a, args...; kwargs...)
+    @inline findprev(p, A::AbstractInboundsArray, args...; kwargs...) = findprev(p, A.a, args...; kwargs...)
+    @inline findall(A::AbstractInboundsArray) = findall(A.a)
+    @inline findall(p, A::AbstractInboundsArray, args...; kwargs...) = findall(p, A.a, args...; kwargs...)
+    @inline findmax(A::AbstractInboundsArray, args...; kwargs...) = findmax(A.a, args...; kwargs...)
+    @inline findmin(A::AbstractInboundsArray, args...; kwargs...) = findmin(A.a, args...; kwargs...)
+    @inline findmax!(rval, rind, A::AbstractInboundsArray, args...; kwargs...) = findmax!(rval, rind, A.a, args...; kwargs...)
+    @inline findmin!(rval, rind, A::AbstractInboundsArray, args...; kwargs...) = findmin!(rval, rind, A.a, args...; kwargs...)
 end
 
 include("LinearAlgebra_support.jl")

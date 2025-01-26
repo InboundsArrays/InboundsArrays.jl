@@ -115,6 +115,9 @@ At present, `InboundsArray` supports:
     * `reshape()` and `vec()`
     * `reverse!()`, `reverse()`, `push!()`, `pop!()`
     * `sum()`, `prod()`, `maximum()`, `minimum()`, `extrema()`, `all()`, `any()`
+    * `searchsorted()`, `searchsortedfirst()`, `searchsortedlast()`,
+      `findfirst()`, `findlast()`, `findnext()`, `findprev()`, `findall()`,
+      `findmax()`, `findmin()`, `findmax!()`, `findmin!()`
     * If inheriting from `AbstractArray` is enabled:
         * The `AbstractArray` interface and broadcasting (returning an `InboundsArray`)
         * Also any package that only requires the generic `AbstractArray` interface

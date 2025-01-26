@@ -130,6 +130,17 @@ function runtests()
             @test any(@view b[1:3]) === true
             @test any(b[1:0]) === false
             @test any(@view b[1:0]) === false
+            @test searchsorted(a, 2.0) == [2]
+            @test searchsortedfirst(a, 2.0) == 2
+            @test searchsortedlast(a, 2.0) == 2
+            @test findfirst(InboundsArray([false, true, false, true])) == 2
+            @test findfirst((x) -> x > 1.5, a) == 2
+            @test findlast(InboundsArray([false, true, false, true])) == 4
+            @test findlast((x) -> x > 1.5, a) == 4
+            @test findnext(InboundsArray([false, true, false, true]), 3) == 4
+            @test findnext((x) -> x > 1.5, a, 3) == 3
+            @test findprev(InboundsArray([false, true, false, true]), 3) == 2
+            @test findprev((x) -> x > 1.5, a, 3) == 3
         end
 
         @testset "InboundsMatrix" begin

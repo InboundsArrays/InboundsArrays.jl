@@ -113,6 +113,7 @@ At present, `InboundsArray` supports:
     * `getindex()`, `setindex!()`, `length()`, `size()`, `axes()`, `similar()`.
     * Broadcasting
     * `reshape()` and `vec()`
+    * `reverse!()`, `reverse()`, `push!()`, `pop!()`
     * If inheriting from `AbstractArray` is enabled:
         * The `AbstractArray` interface and broadcasting (returning an `InboundsArray`)
         * Also any package that only requires the generic `AbstractArray` interface

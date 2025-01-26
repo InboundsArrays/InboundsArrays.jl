@@ -128,7 +128,8 @@ InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 import Base: getindex, setindex!, size, IndexStyle, length, similar, axes, BroadcastStyle,
              copyto!, copy, resize!, unsafe_convert, strides, elsize, view, maybeview,
              reshape, isapprox, iterate, eachindex, broadcastable, vec, *, adjoint,
-             lastindex, isassigned, reverse!, reverse, push!, pop!
+             lastindex, isassigned, reverse!, reverse, push!, pop!, sum, prod, maximum,
+             minimum, all, any, extrema
 
 @inline InboundsArray(A::InboundsArray) = A
 
@@ -374,6 +375,14 @@ if !inherit_from_AbstractArray
     @inline function isapprox(x::AbstractInboundsArray, y::AbstractInboundsArray; kwargs...)
         return isapprox(x.a, y.a; kwargs...)
     end
+
+    @inline sum(A::AbstractInboundsArray, args...; kwargs...) = sum(A.a, args...; kwargs...)
+    @inline prod(A::AbstractInboundsArray, args...; kwargs...) = prod(A.a, args...; kwargs...)
+    @inline maximum(A::AbstractInboundsArray, args...; kwargs...) = maximum(A.a, args...; kwargs...)
+    @inline minimum(A::AbstractInboundsArray, args...; kwargs...) = minimum(A.a, args...; kwargs...)
+    @inline extrema(A::AbstractInboundsArray, args...; kwargs...) = extrema(A.a, args...; kwargs...)
+    @inline all(A::AbstractInboundsArray, args...; kwargs...) = all(A.a, args...; kwargs...)
+    @inline any(A::AbstractInboundsArray, args...; kwargs...) = any(A.a, args...; kwargs...)
 end
 
 include("LinearAlgebra_support.jl")

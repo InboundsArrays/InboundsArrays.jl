@@ -232,10 +232,10 @@ end
 
 # Define these so that a broadcast operations with an InboundsArray return an
 # InboundsArray - see https://docs.julialang.org/en/v1/manual/interfaces/#Selecting-an-appropriate-output-array
-struct InboundsArrayStyle{A<:AbstractInboundsArray} <: Broadcast.AbstractArrayStyle{Any} end
-BroadcastStyle(::Type{<:InboundsArray{T, N, TArray}}) where {T, N, TArray} = InboundsArrayStyle{InboundsArray{T, N, TArray}}()
+struct InboundsArrayStyle{T, N} <: Broadcast.AbstractArrayStyle{Any} end
+BroadcastStyle(::Type{<:AbstractInboundsArray{T, N}}) where {T, N} = InboundsArrayStyle{T, N}()
 
-@inline function similar(bc::Broadcast.Broadcasted{InboundsArrayStyle{InboundsArray{T, N, TArray}}}, ::Type{ElType}) where {T, N, TArray, ElType}
+@inline function similar(bc::Broadcast.Broadcasted{InboundsArrayStyle{T, N}}, ::Type{ElType}) where {T, N, ElType}
     # Scan the inputs for the InboundsArray:
     A = find_iba(bc)
     # Create the output as an InboundsArray
@@ -280,6 +280,10 @@ end
 
 @inline function view(a::AbstractInboundsArray, I::Vararg{Any,M}) where M
     return InboundsArray(view(a.a, I...))
+end
+
+@inline function maybeview(a::AbstractInboundsArray, I::Vararg{Any,M}) where M
+    return InboundsArray(maybeview(a.a, I...))
 end
 
 @inline function *(A::InboundsArray{TA, NA, TArrayA}, x::AbstractArray{Tx, Nx}) where {TA, NA, TArrayA, Tx, Nx}

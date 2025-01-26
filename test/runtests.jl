@@ -97,6 +97,38 @@ function runtests()
             @test isequal(a, [6.0, 8.0, 10.0, 12.0])
             @test b isa Float64
             @test b == 14.0
+
+            a .= [1.0, 2.0, 3.0, 4.0]
+            @test sum(a) == 10.0
+            @test sum(a[1:3]) == 6.0
+            @test sum(@view a[1:3]) == 6.0
+            @test sum(a[1:0]) == 0.0
+            @test sum(@view a[1:0]) == 0.0
+            @test prod(a) == 24.0
+            @test prod(a[1:3]) == 6.0
+            @test prod(@view a[1:3]) == 6.0
+            @test prod(a[1:0]) == 1.0
+            @test prod(@view a[1:0]) == 1.0
+            @test maximum(a) == 4.0
+            @test maximum(a[1:3]) == 3.0
+            @test maximum(@view a[1:3]) == 3.0
+            @test minimum(a) == 1.0
+            @test minimum(a[1:3]) == 1.0
+            @test minimum(@view a[1:3]) == 1.0
+            @test extrema(a) == (1.0, 4.0)
+            @test extrema(a[1:3]) == (1.0, 3.0)
+            @test extrema(@view a[1:3]) == (1.0, 3.0)
+            b = InboundsVector([true, true, true, false])
+            @test all(b) === false
+            @test all(b[1:3]) === true
+            @test all(@view b[1:3]) === true
+            @test all(b[1:0]) === true
+            @test all(@view b[1:0]) === true
+            @test any(b) === true
+            @test any(b[1:3]) === true
+            @test any(@view b[1:3]) === true
+            @test any(b[1:0]) === false
+            @test any(@view b[1:0]) === false
         end
 
         @testset "InboundsMatrix" begin
@@ -155,6 +187,9 @@ function runtests()
 
             @test a[1:1, :] isa InboundsMatrix{Float64, Matrix{Float64}}
             @test a[:, 1:1] isa InboundsMatrix{Float64, Matrix{Float64}}
+
+            a .= [1.0 2.0; 3.0 4.0]
+            @test sum(a) == 10.0
         end
 
         @testset "InboundsArray" begin
@@ -235,6 +270,9 @@ function runtests()
             @test a[1:1, :, :] isa InboundsArray{Float64, 3, Array{Float64, 3}}
             @test a[:, 1:1, :] isa InboundsArray{Float64, 3, Array{Float64, 3}}
             @test a[:, :, 1:1] isa InboundsArray{Float64, 3, Array{Float64, 3}}
+
+            a .= [1.0 2.0; 3.0 4.0;;; 1.0 2.0; 3.0 4.0]
+            @test sum(a) == 20.0
         end
 
         @testset "LinearAlgebra interface" begin

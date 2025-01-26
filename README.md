@@ -114,6 +114,7 @@ At present, `InboundsArray` supports:
     * Broadcasting
     * `reshape()` and `vec()`
     * `reverse!()`, `reverse()`, `push!()`, `pop!()`
+    * `sum()`, `prod()`, `maximum()`, `minimum()`, `extrema()`, `all()`, `any()`
     * If inheriting from `AbstractArray` is enabled:
         * The `AbstractArray` interface and broadcasting (returning an `InboundsArray`)
         * Also any package that only requires the generic `AbstractArray` interface

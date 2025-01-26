@@ -203,6 +203,16 @@ function runtests()
 
             a .= [1.0 2.0; 3.0 4.0]
             @test sum(a) == 10.0
+            ia = inv(a)
+            @test ia isa InboundsMatrix{Float64}
+            @test isclose(ia, [4.0 -2.0; -3.0 1.0] ./ (-2.0))
+            ta = transpose(a)
+            @test ta isa InboundsMatrix{Float64}
+            @test isequal(ta, [1.0 3.0; 2.0 4.0])
+            ca = InboundsArray([(1.0 + 2.0im) (3.0 + 4.0im); (5.0 + 6.0im) (7.0 + 8.0im)])
+            aca = adjoint(ca)
+            @test aca isa InboundsMatrix{ComplexF64}
+            @test isequal(aca, [(1.0 - 2.0im) (5.0 - 6.0im); (3.0 - 4.0im) (7.0 - 8.0im)])
         end
 
         @testset "InboundsArray" begin

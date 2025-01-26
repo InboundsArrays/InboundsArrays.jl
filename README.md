@@ -115,6 +115,7 @@ At present, `InboundsArray` supports:
     * `reshape()` and `vec()`
     * `reverse!()`, `reverse()`, `push!()`, `pop!()`
     * `sum()`, `prod()`, `maximum()`, `minimum()`, `extrema()`, `all()`, `any()`
+    * `adjoint()`, `transpose()`, `inv()`
     * `searchsorted()`, `searchsortedfirst()`, `searchsortedlast()`,
       `findfirst()`, `findlast()`, `findnext()`, `findprev()`, `findall()`,
       `findmax()`, `findmin()`, `findmax!()`, `findmin!()`

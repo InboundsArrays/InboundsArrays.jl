@@ -23,13 +23,21 @@ if !inherit_from_AbstractArray
     @inline function UBuffer(data::AbstractInboundsArray, args...)
         return UBuffer(data.a, args...)
     end
-    @inline function VBuffer(data::AbstractInboundsArray, args...)
-        return VBuffer(data.a, args...)
+
+    @inline function VBuffer(arr::InboundsArray, args...)
+        return VBuffer(arr.a, args...)
+    end
+    @inline function VBuffer(arr::InboundsArray, counts::InboundsArray, args...)
+        return VBuffer(arr.a, counts.a, args...)
+    end
+    @inline function VBuffer(arr::InboundsArray, counts::InboundsArray, displs::InboundsArray, args...)
+        return VBuffer(arr.a, counts.a, displs.a, args...)
     end
 
-    using MPI: Comm, Win
-    import MPI: Scatter!, Gather!, Allgather!, Allgather, Reduce, Allreduce, Scan, Exscan,
-           Neighbor_allgather!, Neighbor_allgatherv!, Win_attach!, Send
+    using MPI: Comm, Win, Comm_rank, Comm_size
+    import MPI: Scatter!, Gather!, Gather, Allgather!, Allgather, Reduce, Allreduce, Scan,
+                Exscan, Neighbor_allgather!, Neighbor_allgatherv!, Win_attach!,
+                Win_detach!, Send
 
     Scatter!(sendbuf::AbstractInboundsArray{T}, recvbuf::Union{Ref{T},AbstractInboundsArray{T}}, root::Integer, comm::Comm) where {T} =
         Scatter!(UBuffer(sendbuf,length(recvbuf)), recvbuf, root, comm)
@@ -80,12 +88,12 @@ if !inherit_from_AbstractArray
         Neighbor_allgatherv!(sendbuf, VBuffer(recvbuf, length(sendbuf)), graph_comm)
     function Win_attach!(win::Win, base::AbstractInboundsArray{T}) where T
         # int MPI_Win_attach(MPI_Win win, void *base, MPI_Aint size)
-        API.MPI_Win_attach(win, base.a, sizeof(base))
+        MPI.API.MPI_Win_attach(win, base.a, sizeof(base))
         push!(win.object, base.a)
     end
     function Win_detach!(win::Win, base::AbstractInboundsArray{T}) where T
         # int MPI_Win_detach(MPI_Win win, const void *base)
-        API.MPI_Win_detach(win, base.a)
+        MPI.API.MPI_Win_detach(win, base.a)
         delete!(win.object, base.a)
     end
     Send(arr::AbstractInboundsArray, dest::Integer, tag::Integer, comm::Comm) =

@@ -623,6 +623,11 @@ function runtests()
                 @test isequal(b, ones(3, 4, 5))
 
                 b .= 0.0
+                vb = MPI.VBuffer(b, InboundsVector([3 * 4 * 5]))
+                MPI.Allgatherv!(a, vb, MPI.COMM_WORLD)
+                @test isequal(b, ones(3, 4, 5))
+
+                b .= 0.0
                 MPI.Bcast!(a, 0, MPI.COMM_WORLD)
                 @test isequal(a, ones(3, 4, 5))
             end

@@ -126,3 +126,4 @@ At present, `InboundsArray` supports:
     * `Buffer`, `UBuffer`, `VBuffer`
 * `FFTW`
     * `plan_fft!`, `plan_ifft!`, `*`
+* `HDF5` is intended to support all functionality

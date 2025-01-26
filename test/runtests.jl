@@ -74,6 +74,25 @@ function runtests()
             @test !isa(get_noninbounds(zeros(3)), AbstractInboundsArray)
 
             @test a[1:3] isa InboundsVector{Float64, Vector{Float64}}
+
+            a .= [6.0, 8.0, 10.0, 12.0]
+            @test reverse(a) isa InboundsVector{Float64, Vector{Float64}}
+            @test isequal(reverse(a), [12.0, 10.0, 8.0, 6.0])
+            reverse!(a)
+            @test a isa InboundsVector{Float64, Vector{Float64}}
+            @test isequal(a, [12.0, 10.0, 8.0, 6.0])
+
+            a .= [6.0, 8.0, 10.0, 12.0]
+            b = push!(a, 14.0)
+            @test a isa InboundsVector{Float64, Vector{Float64}}
+            @test b isa InboundsVector{Float64, Vector{Float64}}
+            @test isequal(a, [6.0, 8.0, 10.0, 12.0, 14.0])
+            @test isequal(b, a)
+            b = pop!(a)
+            @test a isa InboundsVector{Float64, Vector{Float64}}
+            @test isequal(a, [6.0, 8.0, 10.0, 12.0])
+            @test b isa Float64
+            @test b == 14.0
         end
 
         @testset "InboundsMatrix" begin

@@ -128,7 +128,7 @@ InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 import Base: getindex, setindex!, size, IndexStyle, length, similar, axes, BroadcastStyle,
              copyto!, copy, resize!, unsafe_convert, strides, elsize, view, maybeview,
              reshape, isapprox, iterate, eachindex, broadcastable, vec, *, adjoint,
-             lastindex, isassigned
+             lastindex, isassigned, reverse!, reverse, push!, pop!
 
 @inline InboundsArray(A::InboundsArray) = A
 
@@ -290,6 +290,24 @@ end
 end
 @inline function *(A::InboundsArray{Tm, 2, TArrayA}, x::InboundsArray{Tx, Nx, TArrayx}) where {Tm, TArrayA, Tx, Nx, TArrayx}
     return InboundsArray(A.a * x.a)
+end
+
+@inline function reverse!(v::AbstractInboundsArray{T, 1} where T)
+    reverse!(v.a)
+    return v
+end
+
+@inline function reverse(v::InboundsVector)
+    return InboundsVector(reverse(v.a))
+end
+
+@inline function push!(v::AbstractInboundsArray{T, 1} where T, args...)
+    push!(v.a, args...)
+    return v
+end
+
+@inline function pop!(v::AbstractInboundsArray{T, 1} where T, args...)
+    return pop!(v.a, args...)
 end
 
 if !inherit_from_AbstractArray

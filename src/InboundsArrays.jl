@@ -127,11 +127,11 @@ InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 
 import Base: getindex, setindex!, size, IndexStyle, length, ndims, similar, axes,
              BroadcastStyle, copyto!, copy, resize!, unsafe_convert, strides, elsize,
-             view, maybeview, reshape, isapprox, iterate, eachindex, broadcastable, vec,
-             *, adjoint, transpose, inv, lastindex, isassigned, reverse!, reverse, push!,
-             pop!, sum, prod, maximum, minimum, all, any, extrema, searchsorted,
-             searchsortedfirst, searchsortedlast, findfirst, findlast, findnext, findprev,
-             findall, findmax, findmin, findmax!, findmin!
+             view, maybeview, reshape, selectdim, isapprox, iterate, eachindex,
+             broadcastable, vec, *, adjoint, transpose, inv, lastindex, isassigned,
+             reverse!, reverse, push!, pop!, sum, prod, maximum, minimum, all, any,
+             extrema, searchsorted, searchsortedfirst, searchsortedlast, findfirst,
+             findlast, findnext, findprev, findall, findmax, findmin, findmax!, findmin!
 
 @inline InboundsArray(A::InboundsArray) = A
 
@@ -274,6 +274,10 @@ end
 
 @inline function reshape(a::AbstractInboundsArray, dims::Int64...)
     return InboundsArray(reshape(a.a, dims...))
+end
+
+@inline function selectdim(a::AbstractInboundsArray, d::Integer, i)
+    return InboundsArray(selectdim(a.a, d, i))
 end
 
 @inline function unsafe_convert(pt::Type{Ptr{T}}, a::InboundsArrays.InboundsArray{T, N, TArray}) where {T, N, TArray}

@@ -110,7 +110,7 @@ Coverage
 
 At present, `InboundsArray` supports:
 * `Base` functionality
-    * `getindex()`, `setindex!()`, `length()`, `size()`, `axes()`, `similar()`.
+    * `getindex()`, `setindex!()`, `length()`, `size()`, `ndims()`, `axes()`, `similar()`.
     * Broadcasting
     * `reshape()` and `vec()`
     * `reverse!()`, `reverse()`, `push!()`, `pop!()`

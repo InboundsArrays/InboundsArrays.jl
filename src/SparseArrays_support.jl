@@ -76,6 +76,7 @@ function copy(m::InboundsSparseMatrixCSC{Tv, Ti}) where {Tv, Ti}
 end
 
 @inline sparse(m::InboundsSparseMatrixCSC) = copy(m)
+@inline sparse(I::InboundsVector, J::InboundsVector, V::InboundsVector) = InboundsSparseMatrixCSC(sparse(I.a, J.a, V.a))
 
 if !inherit_from_AbstractArray
     @inline sparse(m::InboundsMatrix) = InboundsSparseMatrixCSC(sparse(m.a))

@@ -384,6 +384,14 @@ function runtests()
             @test isequal(A, sA)
             @test sA isa InboundsSparseMatrixCSC
 
+            sB = sparse(A)
+            @test isequal(A, sB)
+            @test sB isa InboundsSparseMatrixCSC
+
+            sC = sparse(InboundsVector([1, 2, 1, 2]), InboundsVector([1, 1, 2, 2]), vec(A))
+            @test isequal(A, sC)
+            @test sC isa InboundsSparseMatrixCSC
+
             mul!(y, sA, x)
             @test isequal(y, [19.0, 43.0])
             @test y isa InboundsVector

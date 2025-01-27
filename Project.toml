@@ -21,8 +21,10 @@ MPIExt = "MPI"
 
 [compat]
 FFTW = "1.5"
+HDF5 = "0.17"
 LinearAlgebra = "1"
 MPI = "0.20"
+Preferences = "1.4"
 SparseArrays = "1.9"
 SparseMatricesCSR = "0.6"
 julia = "1.9"

@@ -107,6 +107,24 @@ function runtests()
             @test b isa Float64
             @test b == 14.0
 
+            a = InboundsVector([1.0, 2.0, 3.0, 4.0])
+            b = InboundsVector([5.0, 6.0, 7.0, 8.0])
+            c = vcat(a, b)
+            @test c isa InboundsVector{Float64, Vector{Float64}}
+            @test isequal(c, [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0])
+
+            a = InboundsVector([1.0, 2.0, 3.0, 4.0])
+            b = InboundsVector([5.0, 6.0, 7.0, 8.0])
+            c = hcat(a, b)
+            @test c isa InboundsMatrix{Float64, Matrix{Float64}}
+            @test isequal(c, [1.0 5.0; 2.0 6.0; 3.0 7.0; 4.0 8.0])
+
+            a = InboundsVector([1.0, 2.0, 3.0, 4.0])
+            b = InboundsVector([5.0, 6.0, 7.0, 8.0])
+            c = hvcat(1, a, b)
+            @test c isa InboundsMatrix{Float64, Matrix{Float64}}
+            @test isequal(c, [1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0])
+
             a .= [1.0, 2.0, 3.0, 4.0]
             @test sum(a) == 10.0
             @test sum(a[1:3]) == 6.0

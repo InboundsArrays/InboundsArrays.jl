@@ -129,9 +129,10 @@ import Base: getindex, setindex!, size, IndexStyle, length, ndims, similar, axes
              BroadcastStyle, copyto!, copy, resize!, unsafe_convert, strides, elsize,
              view, maybeview, reshape, selectdim, isapprox, iterate, eachindex,
              broadcastable, vec, *, adjoint, transpose, inv, lastindex, isassigned,
-             reverse!, reverse, push!, pop!, sum, prod, maximum, minimum, all, any,
-             extrema, searchsorted, searchsortedfirst, searchsortedlast, findfirst,
-             findlast, findnext, findprev, findall, findmax, findmin, findmax!, findmin!
+             reverse!, reverse, push!, pop!, vcat, hcat, hvcat, sum, prod, maximum,
+             minimum, all, any, extrema, searchsorted, searchsortedfirst,
+             searchsortedlast, findfirst, findlast, findnext, findprev, findall, findmax,
+             findmin, findmax!, findmin!
 
 @inline InboundsArray(A::InboundsArray) = A
 
@@ -332,6 +333,23 @@ end
 
 @inline function pop!(v::AbstractInboundsArray{T, 1} where T, args...)
     return pop!(v.a, args...)
+end
+
+@inline vcat(a::AbstractInboundsArray, b::AbstractInboundsArray...) = InboundsArray(@inbounds vcat(a.a, (x.a for x ∈ b)...))
+@inline vcat(a::AbstractInboundsArray{<:Number}, b::Union{Number, AbstractInboundsArray{<:Number}}...) = InboundsArray(@inbounds vcat(a.a, (x isa AbstractInboundsArray ? x.a : x for x ∈ b)...))
+@inline hcat(a::AbstractInboundsArray, b::AbstractInboundsArray...) = InboundsArray(@inbounds hcat(a.a, (x.a for x ∈ b)...))
+@inline hcat(a::AbstractInboundsArray{<:Number}, b::Union{Number,AbstractInboundsArray{<:Number}}...) = InboundsArray(@inbounds hcat(a.a, (x isa AbstractInboundsArray ? x.a : x for x ∈ b)...))
+@inline hvcat(blocks_per_row::Int64, a::AbstractInboundsArray, b::AbstractInboundsArray...) = InboundsArray(@inbounds hvcat(blocks_per_row, a.a, (x.a for x ∈ b)...))
+@inline hvcat(blocks_per_row::Union{Tuple{Vararg{Int}}, Int}, a::AbstractInboundsArray, b::AbstractInboundsArray...) = InboundsArray(@inbounds hvcat(blocks_per_row, a.a, (x.a for x ∈ b)...))
+@inline function hvcat(blocks_per_row::Int64,
+                       a::AbstractInboundsArray{<:Number},
+                       b::Union{Number, AbstractInboundsArray{<:Number}}...)
+    return InboundsArray(@inbounds hvcat(blocks_per_row, a.a, (x isa AbstractInboundsArray ? x.a : x for x ∈ b)...))
+end
+@inline function hvcat(blocks_per_row::Union{Tuple{Vararg{Int}}, Int},
+                       a::AbstractInboundsArray{<:Number},
+                       b::Union{Number, AbstractInboundsArray{<:Number}}...)
+    return InboundsArray(@inbounds hvcat(blocks_per_row, a.a, (x isa AbstractInboundsArray ? x.a : x for x ∈ b)...))
 end
 
 @inline adjoint(A::InboundsArray) = InboundsArray(@inbounds adjoint(A.a))

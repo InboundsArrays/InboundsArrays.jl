@@ -177,6 +177,13 @@ function runtests()
             @test c isa InboundsMatrix
             @test isequal(c, [30.0 48.0; 70.0 96.0])
 
+            e = InboundsMatrix([1.0 2.0 3.0; 4.0 5.0 6.0])
+            f = InboundsVector([10.0, 20.0])
+            g = e .+ f
+            @test g isa InboundsMatrix{Float64, Matrix{Float64}}
+            @test size(g) == (2, 3)
+            @test isequal(g, [11.0 12.0 13.0; 24.0 25.0 26.0])
+
             d = similar(a)
             @test d isa InboundsMatrix{Float64, Matrix{Float64}}
             @test size(d) == (2, 2)

@@ -242,17 +242,23 @@ end
 
 # Define these so that a broadcast operations with an InboundsArray return an
 # InboundsArray - see https://docs.julialang.org/en/v1/manual/interfaces/#Selecting-an-appropriate-output-array
-struct InboundsArrayStyle{T, N} <: Broadcast.AbstractArrayStyle{Any} end
-BroadcastStyle(::Type{<:AbstractInboundsArray{T, N}}) where {T, N} = InboundsArrayStyle{T, N}()
+struct InboundsArrayStyle{N} <: Broadcast.AbstractArrayStyle{N} end
 
-@inline function similar(bc::Broadcast.Broadcasted{InboundsArrayStyle{T, N}}, ::Type{ElType}) where {T, N, ElType}
+# These constructors with Val arguments seem to be needed to support broadcasting together
+# arrays with different shapes (see base/broadcast.jl).
+InboundsArrayStyle(::Val{N}) where N = InboundsArrayStyle{N}()
+InboundsArrayStyle{M}(::Val{N}) where {N,M} = InboundsArrayStyle{N}()
+
+BroadcastStyle(::Type{<:AbstractInboundsArray{T, N}}) where {T, N} = InboundsArrayStyle{N}()
+
+@inline function similar(bc::Broadcast.Broadcasted{InboundsArrayStyle{N}}, ::Type{ElType}) where {N, ElType}
     # Scan the inputs for the InboundsArray:
     A = find_iba(bc)
     # Create the output as an InboundsArray
     similar(A, ElType, axes(bc))
 end
 # Special version to handle 0-d arrays, copied from Base.
-@inline copy(bc::Broadcast.Broadcasted{<:InboundsArrayStyle{InboundsArray{T, 0, TArray}}} where {T, TArray}) = bc[CartesianIndex()]
+@inline copy(bc::Broadcast.Broadcasted{<:InboundsArrayStyle{0}}) = bc[CartesianIndex()]
 
 "`A = find_iba(As)` returns the first InboundsArray among the arguments."
 find_iba(bc::Base.Broadcast.Broadcasted) = find_iba(bc.args)
@@ -262,7 +268,7 @@ find_iba(::Tuple{}) = nothing
 find_iba(a::InboundsArray, rest) = a
 find_iba(::Any, rest) = find_iba(rest)
 
-@inline function copyto!(A::InboundsArray, bc::Broadcast.Broadcasted{InboundsArrayStyle{InboundsArray{T, N, TArray}}}) where {T, N, TArray}
+@inline function copyto!(A::InboundsArray, bc::Broadcast.Broadcasted{InboundsArrayStyle{N}}) where N
     @inbounds copyto!(A.a, bc)
     return A
 end

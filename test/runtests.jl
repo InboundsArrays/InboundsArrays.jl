@@ -19,6 +19,10 @@ try
     using HDF5
 catch
 end
+try
+    using NCDatasets
+catch
+end
 
 function isequal(args...)
     return isapprox(args...; rtol=0.0, atol=0.0)
@@ -623,35 +627,90 @@ function runtests()
                 f["a"] = a
                 @test isequal(f["a"][:, :, :], ones(3, 4, 5))
 
-                v_io = io_var = create_dataset(f, "v2", Float64, (3,))
+                v_io = create_dataset(f, "v2", Float64, (3,))
                 v_io = v
                 @test isequal(v_io[:], ones(3))
-                m_io = io_var = create_dataset(f, "m2", Float64, (3, 4))
+                m_io = create_dataset(f, "m2", Float64, (3, 4))
                 m_io = m
                 @test isequal(m_io[:, :], ones(3, 4))
-                a_io = io_var = create_dataset(f, "a2", Float64, (3, 4, 5))
+                a_io = create_dataset(f, "a2", Float64, (3, 4, 5))
                 a_io = a
                 @test isequal(a_io[:, :, :], ones(3, 4, 5))
 
-                v_io = io_var = create_dataset(f, "v3", Float64, (3,))
+                v_io = create_dataset(f, "v3", Float64, (3,))
                 v_io[1:3] = @view v[1:3]
                 @test isequal(v_io[:], ones(3))
-                m_io = io_var = create_dataset(f, "m3", Float64, (3, 4))
+                m_io = create_dataset(f, "m3", Float64, (3, 4))
                 m_io[1:3, 1:4] = @view m[1:3, 1:4]
                 @test isequal(m_io[:, :], ones(3, 4))
-                a_io = io_var = create_dataset(f, "a3", Float64, (3, 4, 5))
+                a_io = create_dataset(f, "a3", Float64, (3, 4, 5))
                 a_io[1:3, 1:4, 1:5] = @view a[1:3, 1:4, 1:5]
                 @test isequal(a_io[:, :, :], ones(3, 4, 5))
 
-                v_io = io_var = create_dataset(f, "v4", Float64, (3, 2))
+                v_io = create_dataset(f, "v4", Float64, (3, 2))
                 v_io[:, 1] = v
                 v_io[:, 2] = v
                 @test isequal(v_io[:, :], ones(3, 2))
-                m_io = io_var = create_dataset(f, "m4", Float64, (3, 4, 2))
+                m_io = create_dataset(f, "m4", Float64, (3, 4, 2))
                 m_io[:, :, 1] = m
                 m_io[:, :, 2] = m
                 @test isequal(m_io[:, :, :], ones(3, 4, 2))
-                a_io = io_var = create_dataset(f, "a4", Float64, (3, 4, 5, 2))
+                a_io = create_dataset(f, "a4", Float64, (3, 4, 5, 2))
+                a_io[:, :, :, 1] = a
+                a_io[:, :, :, 2] = a
+                @test isequal(a_io[:, :, :, :], ones(3, 4, 5, 2))
+
+                close(f)
+            end
+        end
+
+        ncdatasetsext = Base.get_extension(InboundsArrays, :NCDatasetsExt)
+        if ncdatasetsext !== nothing
+            @testset "NCDatasetsExt" begin
+                v = InboundsArray(ones(3))
+                m = InboundsArray(ones(3, 4))
+                a = InboundsArray(ones(3, 4, 5))
+
+                testdir = tempname()
+                mkpath(testdir)
+
+                filename = joinpath(testdir, "test.h5")
+
+                f = NCDataset(filename, "c")
+                defDim(f, "x", 3)
+                defDim(f, "y", 4)
+                defDim(f, "z", 5)
+                defDim(f, "t", 2)
+
+                v_io = defVar(f, "v2", Float64, ("x",))
+                v_io = v
+                @test isequal(v_io[:], ones(3))
+                m_io = defVar(f, "m2", Float64, ("x", "y"))
+                m_io = m
+                @test isequal(m_io[:, :], ones(3, 4))
+                a_io = defVar(f, "a2", Float64, ("x", "y", "z"))
+                a_io = a
+                @test isequal(a_io[:, :, :], ones(3, 4, 5))
+
+                v_io = defVar(f, "v3", Float64, ("x",))
+                v_io[1:3] = @view v[1:3]
+                @test isequal(v_io[:], ones(3))
+                m_io = defVar(f, "m3", Float64, ("x", "y"))
+                m_io[1:3, 1:4] = @view m[1:3, 1:4]
+                @test isequal(m_io[:, :], ones(3, 4))
+                a_io = defVar(f, "a3", Float64, ("x", "y", "z"))
+                a_io[1:3, 1:4, 1:5] = @view a[1:3, 1:4, 1:5]
+                @test isequal(a_io[:, :, :], ones(3, 4, 5))
+
+                v_io = defVar(f, "v4", Float64, ("x", "t"))
+                v_io[:, 1] = v
+                v_io[:, 2] = v
+                @test isequal(v_io[:, :], ones(3, 2))
+                m_io = defVar(f, "m4", Float64, ("x", "y", "t"))
+                m_io[:, :, 1] = m
+                m_io[:, :, 2] = m
+                @test isequal(m_io[:, :, :], ones(3, 4, 2))
+                a_io = defVar(f, "a4", Float64, ("x", "y", "z", "t"))
                 a_io[:, :, :, 1] = a
                 a_io[:, :, :, 2] = a
                 @test isequal(a_io[:, :, :, :], ones(3, 4, 5, 2))

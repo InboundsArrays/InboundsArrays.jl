@@ -23,6 +23,10 @@ try
     using NCDatasets
 catch
 end
+try
+    using CairoMakie
+catch
+end
 
 function isequal(args...)
     return isapprox(args...; rtol=0.0, atol=0.0)
@@ -716,6 +720,16 @@ function runtests()
                 @test isequal(a_io[:, :, :, :], ones(3, 4, 5, 2))
 
                 close(f)
+            end
+        end
+
+        makieext = Base.get_extension(InboundsArrays, :MakieExt)
+        if makieext !== nothing
+            @testset "MakieExt" begin
+                a = InboundsArray([1.0, 2.0, 3.0])
+
+                fig, ax, l = lines(a)
+                @test fig isa Figure
             end
         end
 

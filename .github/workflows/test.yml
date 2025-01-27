@@ -25,11 +25,14 @@ jobs:
           version: '${{ matrix.julia_version }}'
       - uses: julia-actions/cache@v2
       - run: |
-          julia --project -e 'import Pkg; Pkg.add(["FFTW", "HDF5", "CairoMakie", "MPI", "NCDatasets"])'
+          julia --project --check-bounds=yes -e 'import Pkg; Pkg.add(["FFTW", "HDF5", "CairoMakie", "MPI", "NCDatasets"])'
         shell: bash
-      - uses: julia-actions/julia-buildpkg@v1
+      # julia-buildpkg would build using --check-bounds=auto, so Pkg.test()
+      # which defaults to --check-bounds=yes would cause everything to
+      # recompile anyway.
+      #- uses: julia-actions/julia-buildpkg@v1
       - run: |
-          julia --project -e 'using InboundsArrays; InboundsArrays.set_inherit_from_AbstractArray(true)'
+          julia --project --check-bounds=yes -e 'using InboundsArrays; InboundsArrays.set_inherit_from_AbstractArray(true)'
         if: matrix.abstractarray
         shell: bash
       - uses: julia-actions/julia-runtest@v1

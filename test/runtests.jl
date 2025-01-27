@@ -606,7 +606,6 @@ function runtests()
                 @. b = cos(π * (0.0:7.0) / 7)
                 b_fft = r2r * copy(b)
                 @test b_fft isa InboundsVector
-                println("b_fft ", b_fft)
                 @test isclose(b_fft, [0.0, 7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
             end
         end

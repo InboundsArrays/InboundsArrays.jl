@@ -274,16 +274,16 @@ find_iba(::Any, rest) = find_iba(rest)
 end
 
 @inline function resize!(a::InboundsVector, nl::Integer)
-    resize!(a.a, nl)
+    @inbounds resize!(a.a, nl)
     return a
 end
 
 @inline function reshape(a::AbstractInboundsArray, dims::Int64...)
-    return InboundsArray(reshape(a.a, dims...))
+    return InboundsArray(@inbounds reshape(a.a, dims...))
 end
 
 @inline function selectdim(a::AbstractInboundsArray, d::Integer, i)
-    return InboundsArray(selectdim(a.a, d, i))
+    return InboundsArray(@inbounds selectdim(a.a, d, i))
 end
 
 @inline function unsafe_convert(pt::Type{Ptr{T}}, a::InboundsArrays.InboundsArray{T, N, TArray}) where {T, N, TArray}
@@ -299,21 +299,21 @@ end
 end
 
 @inline function view(a::AbstractInboundsArray, I::Vararg{Any,M}) where M
-    return InboundsArray(view(a.a, I...))
+    return InboundsArray(@inbounds view(a.a, I...))
 end
 
 @inline function maybeview(a::AbstractInboundsArray, I::Vararg{Any,M}) where M
-    return InboundsArray(maybeview(a.a, I...))
+    return InboundsArray(@inbounds maybeview(a.a, I...))
 end
 
 @inline function *(A::InboundsArray{TA, NA, TArrayA}, x::AbstractArray{Tx, Nx}) where {TA, NA, TArrayA, Tx, Nx}
-    return InboundsArray(A.a * x)
+    return InboundsArray(@inbounds A.a * x)
 end
 @inline function *(A::AbstractMatrix{TA}, x::InboundsArray{Tx, Nx, TArrayx}) where {TA, Tx, Nx, TArrayx}
-    return InboundsArray(A * x.a)
+    return InboundsArray(@inbounds A * x.a)
 end
 @inline function *(A::InboundsArray{Tm, 2, TArrayA}, x::InboundsArray{Tx, Nx, TArrayx}) where {Tm, TArrayA, Tx, Nx, TArrayx}
-    return InboundsArray(A.a * x.a)
+    return InboundsArray(@inbounds A.a * x.a)
 end
 
 @inline function reverse!(v::AbstractInboundsArray{T, 1} where T)
@@ -334,9 +334,9 @@ end
     return pop!(v.a, args...)
 end
 
-@inline adjoint(A::InboundsArray) = InboundsArray(adjoint(A.a))
-@inline transpose(A::InboundsArray) = InboundsArray(transpose(A.a))
-@inline inv(A::InboundsArray) = InboundsArray(inv(A.a))
+@inline adjoint(A::InboundsArray) = InboundsArray(@inbounds adjoint(A.a))
+@inline transpose(A::InboundsArray) = InboundsArray(@inbounds transpose(A.a))
+@inline inv(A::InboundsArray) = InboundsArray(@inbounds inv(A.a))
 
 if !inherit_from_AbstractArray
     @inline function copy(A::InboundsArray)
@@ -350,7 +350,7 @@ if !inherit_from_AbstractArray
         return A
     end
     @inline vec(A::AbstractInboundsArray) = reshape(A, length(A))
-    @inline lastindex(A::AbstractInboundsArray, args...) = lastindex(A.a, args...)
+    @inline lastindex(A::AbstractInboundsArray, args...) = @inbounds lastindex(A.a, args...)
     @inline isassigned(A::AbstractInboundsArray, args...) = isassigned(A.a, args...)
 
     # Copied from the AbstractArray implementation in base/abstractaray.jl

@@ -15,6 +15,7 @@ HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 MPI = "da04e1cc-30fd-572f-bb4f-1f8673147195"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 NCDatasets = "85f8d34a-cbdd-5861-8df4-14fed0d494ab"
+NaNMath = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
 
 [extensions]
 FFTWExt = "FFTW"
@@ -22,6 +23,7 @@ HDF5Ext = "HDF5"
 MPIExt = "MPI"
 MakieExt = "Makie"
 NCDatasetsExt = "NCDatasets"
+NaNMathExt = "NaNMath"
 
 [compat]
 FFTW = "1.5"
@@ -30,6 +32,7 @@ LinearAlgebra = "1"
 MPI = "0.20"
 Makie = "0.22"
 NCDatasets = "0.14"
+NaNMath = "1.1"
 Preferences = "1.4"
 SparseArrays = "1.9"
 SparseMatricesCSR = "0.6"

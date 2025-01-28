@@ -16,6 +16,7 @@ MPI = "da04e1cc-30fd-572f-bb4f-1f8673147195"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 NCDatasets = "85f8d34a-cbdd-5861-8df4-14fed0d494ab"
 NaNMath = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [extensions]
 FFTWExt = "FFTW"
@@ -24,6 +25,7 @@ MPIExt = "MPI"
 MakieExt = "Makie"
 NCDatasetsExt = "NCDatasets"
 NaNMathExt = "NaNMath"
+StatsBaseExt = "StatsBase"
 
 [compat]
 FFTW = "1.5"
@@ -36,6 +38,7 @@ NaNMath = "1.1"
 Preferences = "1.4"
 SparseArrays = "1.9"
 SparseMatricesCSR = "0.6"
+StatsBase = "0.34"
 julia = "1.9"
 
 [extras]

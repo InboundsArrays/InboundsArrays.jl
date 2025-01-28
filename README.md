@@ -123,13 +123,16 @@ At present, `InboundsArray` supports:
     * If inheriting from `AbstractArray` is enabled:
         * The `AbstractArray` interface and broadcasting (returning an `InboundsArray`)
         * Also any package that only requires the generic `AbstractArray` interface
-* `LinearAlgebra`
-    * `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
-* `SparseArrays` and `SparseMatricesCSR`
-    * `sparse`/`sparsecsr`, `convert`, `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
-* `MPI` is intended to support all functions by wrapping those listed, but has
-  not been comprehensively tested
-    * `Buffer`, `UBuffer`, `VBuffer`
 * `FFTW`
     * `plan_fft!`, `plan_ifft!`, `plan_r2r!`, `*`
 * `HDF5` is intended to support all functionality
+* `LinearAlgebra`
+    * `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
+* `MPI` is intended to support all functions by wrapping those listed, but has
+  not been comprehensively tested
+    * `Buffer`, `UBuffer`, `VBuffer`
+* `NaNMath`
+    * `argmax`, `argmin`, `extrema`, `findmax`, `findmin`, `maximum`, `mean`,
+      `mean_count`, `median`, `minimum`, `std`, `sum`, `var`
+* `SparseArrays` and `SparseMatricesCSR`
+    * `sparse`/`sparsecsr`, `convert`, `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`

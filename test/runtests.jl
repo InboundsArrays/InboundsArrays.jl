@@ -8,7 +8,7 @@ using SparseArrays
 
 # Import packages for extensions if possible
 try
-    using MPI
+    using CairoMakie
 catch
 end
 try
@@ -20,11 +20,15 @@ try
 catch
 end
 try
+    using MPI
+catch
+end
+try
     using NCDatasets
 catch
 end
 try
-    using CairoMakie
+    using NaNMath
 catch
 end
 
@@ -776,8 +780,20 @@ function runtests()
                 @test isequal(a, ones(3, 4, 5))
             end
         end
-    end
 
+        nanmathext = Base.get_extension(InboundsArrays, :NaNMathExt)
+        if nanmathext !== nothing
+            @testset "NaNMathExt" begin
+                a = InboundsArray([1.0, 2.0, 3.0])
+
+                for funcname ∈ nanmathext.oneargfuncs
+                    result = eval(:(NaNMath.$funcname($a)))
+                    @test result isa Union{Number, Tuple, AbstractInboundsArray}
+                end
+            end
+        end
+
+    end
 end
 
 end # module InboundsArraysTests

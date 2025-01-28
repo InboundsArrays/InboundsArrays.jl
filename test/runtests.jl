@@ -31,6 +31,10 @@ try
     using NaNMath
 catch
 end
+try
+    import StatsBase
+catch
+end
 
 function isequal(args...)
     return isapprox(args...; rtol=0.0, atol=0.0)
@@ -793,6 +797,155 @@ function runtests()
             end
         end
 
+        statsbaseext = Base.get_extension(InboundsArrays, :StatsBaseExt)
+        if statsbaseext !== nothing
+            @testset "StatsBaseExt" begin
+                a = InboundsArray([1.0, 2.0, 3.0])
+                b = InboundsArray([4.0, 5.0, 6.0])
+                c = InboundsArray([7.0, 8.0, 9.0])
+                d = InboundsArray([10.0, 11.0, 12.0])
+                mat = InboundsArray([1.0 2.0 3.0; 4.0 5.0 6.0; 7.0 8.0 9.0])
+                identitymat = InboundsArray([1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0])
+                ints = InboundsArray([1, 2, 3])
+
+                for funcname ∈ statsbaseext.oneargfuncs
+                    a .= InboundsArray([1.0, 2.0, 3.0])
+                    b .= InboundsArray([4.0, 5.0, 6.0])
+                    c .= InboundsArray([7.0, 8.0, 9.0])
+                    d .= InboundsArray([10.0, 11.0, 12.0])
+                    mat .= InboundsArray([1.0 2.0 3.0; 4.0 5.0 6.0; 7.0 8.0 9.0])
+                    identitymat .= InboundsArray([1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0])
+                    ints .= InboundsArray([1, 2, 3])
+                    arg1 = a
+                    args = ()
+                    if funcname ∈ (:corkendall, :corspearman, :cov2cor)
+                        arg1 = mat
+                    elseif funcname ∈ (:cronbachalpha,)
+                        arg1 = identitymat
+                    elseif funcname ∈ (:counts, :proportions)
+                        arg1 = ints
+                    elseif funcname ∈ (:countties, :insertion_sort!, :merge_sort!, :zscore!)
+                        args = (1, 2)
+                    elseif funcname ∈ (:cumulant, :histrange, :moment, :renyientropy)
+                        args = (1,)
+                    elseif funcname ∈ (:eweights,)
+                        args = (1:4, 0.5)
+                    elseif funcname ∈ (:quantile, :quantile!)
+                        args = ((0.5,),)
+                    elseif funcname ∈ (:wmedian,)
+                        args = (StatsBase.Weights([0.4, 0.5, 0.6]),)
+                    elseif funcname ∈ (:wquantile,)
+                        args = (StatsBase.Weights([0.4, 0.5, 0.6]), 0.5)
+                    elseif funcname ∈ (:wsum,)
+                        args = (StatsBase.Weights([0.4, 0.5, 0.6]), :)
+                    end
+                    result = eval(:(StatsBase.$funcname($arg1, $args...)))
+                    @test result isa Union{Number, Tuple, Dict, AbstractInboundsArray, StatsBase.CronbachAlpha, StatsBase.ECDF, StatsBase.SummaryStats, Base.Generator}
+                end
+
+                for funcname ∈ statsbaseext.twoargfuncs
+                    a .= InboundsArray([1.0, 2.0, 3.0])
+                    b .= InboundsArray([4.0, 5.0, 6.0])
+                    c .= InboundsArray([7.0, 8.0, 9.0])
+                    d .= InboundsArray([10.0, 11.0, 12.0])
+                    mat .= InboundsArray([1.0 2.0 3.0; 4.0 5.0 6.0; 7.0 8.0 9.0])
+                    identitymat .= InboundsArray([1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0])
+                    ints .= InboundsArray([1, 2, 3])
+                    arg1 = a
+                    arg2 = b
+                    args = ()
+                    if funcname ∈ (:addcounts!,)
+                        arg2 = ints
+                        args = (1:2,)
+                    elseif funcname ∈ (:autocor, :autocov)
+                        arg2 = ints .- 1
+                    elseif funcname ∈ (:cor2cov, :cor2cov!, :cov2cor)
+                        arg1 = mat
+                    elseif funcname ∈ (:counts, :proportions)
+                        arg1 = ints
+                        arg2 = copy(ints)
+                    elseif funcname ∈ (:demean_col!,)
+                        arg2 = mat
+                        args = (1, true)
+                    elseif funcname ∈ (:indicatormat,)
+                        arg2 = a
+                    elseif funcname ∈ (:inverse_rle,)
+                        arg2 = ints
+                    elseif funcname ∈ (:pacf,)
+                        arg2 = InboundsArray([0, 1])
+                    elseif funcname ∈ (:psnr, :wquantile)
+                        args = (1.0,)
+                    elseif funcname ∈ (:quantile!,)
+                        arg2 = b ./ c
+                    elseif funcname ∈ (:var!,)
+                        args = (StatsBase.Weights([0.4, 0.5, 0.6]), 1)
+                    elseif funcname ∈ (:zscore!,)
+                        args = (1.0, 2.0)
+                    end
+                    result = eval(:(StatsBase.$funcname($arg1, $arg2, $args...)))
+                    @test result isa Union{Number, Tuple, Dict, AbstractInboundsArray}
+                end
+
+                for funcname ∈ statsbaseext.threeargfuncs
+                    a .= InboundsArray([1.0, 2.0, 3.0])
+                    b .= InboundsArray([4.0, 5.0, 6.0])
+                    c .= InboundsArray([7.0, 8.0, 9.0])
+                    d .= InboundsArray([10.0, 11.0, 12.0])
+                    mat .= InboundsArray([1.0 2.0 3.0; 4.0 5.0 6.0; 7.0 8.0 9.0])
+                    identitymat .= InboundsArray([1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0])
+                    ints .= InboundsArray([1, 2, 3])
+                    arg1 = a
+                    arg2 = b
+                    arg3 = c
+                    args = ()
+                    if funcname ∈ (:addcounts!,)
+                        arg1 = mat
+                        arg2 = ints
+                        arg3 = copy(ints)
+                        args = ((1:2, 1:2),)
+                    elseif funcname ∈ (:autocor!, :autocov!, :crosscor, :crosscov)
+                        arg3 = ints .- 1
+                    elseif funcname ∈ (:corkendall!,)
+                        arg3 = ints
+                    elseif funcname ∈ (:pacf!,)
+                        arg1 = mat
+                        arg2 = copy(mat)
+                        arg3 = InboundsArray(ones(Int64, 3))
+                    elseif funcname ∈ (:pacf_regress!, :pacf_yulewalker!)
+                        arg1 = mat
+                        arg2 = copy(mat)
+                        arg3 = InboundsArray(zeros(Int64, 3))
+                        args = (1,)
+                    elseif funcname ∈ (:quantile!,)
+                        arg3 = c ./ d
+                    elseif funcname ∈ (:wsum!,)
+                        args = (1,)
+                    end
+                    result = eval(:(StatsBase.$funcname($arg1, $arg2, $arg3, $args...)))
+                    @test result isa Union{Nothing, Number, Tuple, AbstractInboundsArray}
+                end
+
+                for funcname ∈ statsbaseext.fourargfuncs
+                    a .= InboundsArray([1.0, 2.0, 3.0])
+                    b .= InboundsArray([4.0, 5.0, 6.0])
+                    c .= InboundsArray([7.0, 8.0, 9.0])
+                    d .= InboundsArray([10.0, 11.0, 12.0])
+                    mat .= InboundsArray([1.0 2.0 3.0; 4.0 5.0 6.0; 7.0 8.0 9.0])
+                    identitymat .= InboundsArray([1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0])
+                    ints .= InboundsArray([1, 2, 3])
+                    arg1 = a
+                    arg2 = b
+                    arg3 = c
+                    arg4 = d
+                    args = ()
+                    if funcname ∈ (:crosscor!, :crosscov!)
+                        arg4 = ints .- 1
+                    end
+                    result = eval(:(StatsBase.$funcname($arg1, $arg2, $arg3, $arg4, $args...)))
+                    @test result isa Union{Number, Tuple, AbstractInboundsArray}
+                end
+            end
+        end
     end
 end
 

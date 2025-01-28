@@ -136,3 +136,23 @@ At present, `InboundsArray` supports:
       `mean_count`, `median`, `minimum`, `std`, `sum`, `var`
 * `SparseArrays` and `SparseMatricesCSR`
     * `sparse`/`sparsecsr`, `convert`, `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
+* `StatsBase`
+    * `L1dist`, `L2dist`, `Linfdist`, `addcounts!`, `autocor`, `autocor!`,
+      `autocov`, `autocov!`, `aweights`, `competerank`, `cor`, `cor2cov`,
+      `cor2cov!`, `corkendall`, `corkendall!`, `corspearman`, `counteq`,
+      `countmap`, `countne`, `counts`, `countties`, `cov`, `cov2cor`,
+      `cronbachalpha`, `crosscor`, `crosscor!`, `crosscov`, `crosscov!`
+      `crossentropy`,`cumulant`, `demean_col!`, `denserank`, `durbin`,
+      `durbin!`, `ecdf`, `eweights`, `fisher_yates_sample!`, `fweights`,
+      `genvar`, `gkldiv`, `histrange`, `indexmap`, `indicatormat`,
+      `insertion_sort!`, `inverse_rle`, `kldivergence`, `knuths_sample!`,
+      `kurtosis`, `levinson`, `levinson!`, `levelsmap`, `mad!`, `maxad`,
+      `mean`, `mean!`, `mean_and_std`, `mean_and_var`, `meanad`, `median`,
+      `median!`, `merge_sort!`, `middle`, `midpoints`, `mode`, `modes`, `msd`,
+      `moment`, `norepeats`, `ordinalrank`, `pacf`, `pacf!`, `pacf_regress!`,
+      `pacf_yulewalker!`, `partialcor`, `proportionmap`, `proportions`, `psnr`,
+      `pweights`, `quantile`, `quantile!`, `renyientropy`, `rle`, `rmsd`,
+      `sem`, `skewness`, `sqL2dist`, `std`, `summarystats`, `tiedrank`,
+      `totalvar`, `trim`, `trim!`, `trimvar`, `uplo`, `var`, `var!`, `weights`,
+      `winsor`, `winsor!`, `wmean`, `wmedian`, `wquantile`, `wsum`, `wsum!`,
+      `zscore`, `zscore!`

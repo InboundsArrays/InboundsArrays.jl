@@ -282,6 +282,9 @@ end
 @inline function reshape(a::AbstractInboundsArray, dims::Int64...)
     return InboundsArray(@inbounds reshape(a.a, dims...))
 end
+@inline function reshape(a::AbstractInboundsArray, dims::Tuple)
+    return InboundsArray(@inbounds reshape(a.a, dims))
+end
 
 @inline function selectdim(a::AbstractInboundsArray, d::Integer, i)
     return InboundsArray(@inbounds selectdim(a.a, d, i))

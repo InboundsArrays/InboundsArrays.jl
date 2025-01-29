@@ -35,7 +35,7 @@ export InboundsArray, InboundsVector, InboundsMatrix, AbstractInboundsArray,
 
 using Preferences
 
-const default_inherit_from_AbstractArray = false
+const default_inherit_from_AbstractArray = true
 const inherit_from_AbstractArray = @load_preference("inherit_from_AbstractArray", default_inherit_from_AbstractArray)
 
 """

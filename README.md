@@ -50,29 +50,35 @@ extra non-`InboundsArray` arguments. `InboundsArrays` provides many of these
 pass-through methods for commonly used packages/functions (if you need more,
 please open a PR - they are generally short to write!).
 
-In order to guarantee the best performance possible, by default
-`InboundsArrays` is defined so that there will be an error if an
-`InboundsArray` is passed to an unsupported function. This is achieved by not
-making `AbstractInboundsArray` a subtype of `AbstractArray`, so that a
-`MethodError()` will be throw if an `InboundsArray` is passed to a function
-that accepts an `AbstractArray`. In other words, we error rather than risking
-poor performance. If you know that all performance-critical functions are
-supported correctly, but there are some other functions that are not supported,
-or if you know that the `AbstractArray` interface provides optimal performance
-for any unsupported functions, it might be convenient for `InboundsArray` to be
-a subtype of `AbstractArray`. This can be achieved by calling
+Optionally error if using `AbstractArray` interface
+===================================================
+
+By default `InboundsArray` is a subtype of `AbstractArray` so will use the
+`AbstractArray` implementation if it exists and no pass-through method is
+defined.
+
+In order to guarantee the best performance possible, it is possible to define
+`InboundsArrays` so that there will be an error if an `InboundsArray` is passed
+to an unsupported function. This is achieved by not making
+`AbstractInboundsArray` a subtype of `AbstractArray`, so that a `MethodError()`
+will be throw if an `InboundsArray` is passed to a function that accepts an
+`AbstractArray`. In other words, we error rather than risking poor performance.
+If want to check that all performance-critical functions are supported
+correctly, you might want to do this - call
 ```julia
-InboundsArrays.set_inherit_from_AbstractArray(true)
+InboundsArrays.set_inherit_from_AbstractArray(false)
 ```
 This setting will be saved in `LocalPreferences.toml` and so will persist. Call
-again with no argument (or `false`) to reset to the default. After changing the
+again with no argument (or `true`) to reset to the default. After changing the
 setting you must restart Julia and recompile any system images that include
 `InboundsArrays` in order for the change to take effect.
 
-If you use `set_inherit_from_AbstractArray = true`, you are responsible for
-ensuring that there are no significant slow-downs from using `InboundsArray`
-instead of the array type that you would otherwise have used! It is preferred
-to add support for whatever functions you need to `InboundsArrays.jl`.
+If you use `set_inherit_from_AbstractArray = false`, many functions that could
+'just work' using the `AbstractArray` interface will error. You are welcome to
+request support for these functions (or even better open a PR to add the
+support!), but this is likely to make for a less than ideal user experience,
+especially if `InboundsArray`s could be returned from your package to an
+interactive context, where users might then pass them into any function.
 
 Status and development
 ----------------------

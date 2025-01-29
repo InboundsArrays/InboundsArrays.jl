@@ -309,6 +309,15 @@ function runtests()
             @test a[1, 2, 1] == 42.0
             a[1, 2, 1] = 2.0
 
+            @test [1, 2, 3][InboundsArray([1, 2])] isa Vector{Int64}
+            @test [1, 2, 3][InboundsArray([1, 2])] == [1, 2]
+            @test [1, 2, 3][InboundsArray([1 2; 3 1])] isa Matrix{Int64}
+            @test [1, 2, 3][InboundsArray([1 2; 3 1])] == [1 2; 3 1]
+            @test InboundsArray([1, 2, 3])[InboundsArray([1, 2])] isa InboundsVector{Int64, Vector{Int64}}
+            @test isequal(InboundsArray([1, 2, 3])[InboundsArray([1, 2])], [1, 2])
+            @test InboundsArray([1, 2, 3])[InboundsArray([1 2; 3 1])] isa InboundsMatrix{Int64, Matrix{Int64}}
+            @test isequal(InboundsArray([1, 2, 3])[InboundsArray([1 2; 3 1])], [1 2; 3 1])
+
             for i ∈ 1:length(a)
                 a[i] += b[i]
             end

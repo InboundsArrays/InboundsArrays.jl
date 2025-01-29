@@ -54,6 +54,7 @@ function runtests()
             @test size(a) == (4,)
             @test length(a) == 4
             @test ndims(a) == 1
+            @test eltype(a) == Float64
             @test a[2] == 2.0
             a[2] = 42.0
             @test a[2] == 42.0
@@ -192,6 +193,7 @@ function runtests()
             @test size(a) == (2, 2)
             @test length(a) == 4
             @test ndims(a) == 2
+            @test eltype(a) == Float64
             @test a[1, 2] == 2.0
             a[1, 2] = 42.0
             @test a[1, 2] == 42.0
@@ -271,6 +273,7 @@ function runtests()
             @test size(a) == (2, 2, 2)
             @test length(a) == 8
             @test ndims(a) == 3
+            @test eltype(a) == Float64
             @test a[1, 2, 1] == 2.0
             a[1, 2, 1] = 42.0
             @test a[1, 2, 1] == 42.0

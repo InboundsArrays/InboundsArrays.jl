@@ -125,7 +125,7 @@ Construct with one of:
 """
 InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 
-import Base: getindex, setindex!, size, IndexStyle, length, ndims, similar, axes,
+import Base: getindex, setindex!, size, IndexStyle, length, ndims, eltype, similar, axes,
              BroadcastStyle, copyto!, copy, resize!, unsafe_convert, strides, elsize,
              view, maybeview, reshape, selectdim, isapprox, iterate, eachindex,
              broadcastable, vec, *, adjoint, transpose, inv, lastindex, isassigned,
@@ -216,6 +216,8 @@ end
 end
 
 @inline ndims(A::AbstractInboundsArray{T, N}) where {T, N} = N
+
+@inline eltype(A::AbstractInboundsArray{T, N}) where {T, N} = T
 
 @inline function similar(A::InboundsArray)
     return InboundsArray(similar(A.a))

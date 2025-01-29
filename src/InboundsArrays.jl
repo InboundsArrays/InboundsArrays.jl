@@ -125,12 +125,12 @@ Construct with one of:
 """
 InboundsMatrix{T, TMatrix} = InboundsArray{T, 2, TMatrix} where {T, TMatrix}
 
-import Base: getindex, setindex!, size, IndexStyle, length, ndims, eltype, similar, axes,
-             BroadcastStyle, copyto!, copy, resize!, unsafe_convert, strides, elsize,
-             view, maybeview, reshape, selectdim, isapprox, iterate, eachindex,
-             broadcastable, vec, *, adjoint, transpose, inv, lastindex, isassigned,
-             reverse!, reverse, push!, pop!, vcat, hcat, hvcat, repeat, sum, prod,
-             maximum, minimum, all, any, extrema, searchsorted, searchsortedfirst,
+import Base: getindex, setindex!, to_index, size, IndexStyle, length, ndims, eltype,
+             similar, axes, BroadcastStyle, copyto!, copy, resize!, unsafe_convert,
+             strides, elsize, view, maybeview, reshape, selectdim, isapprox, iterate,
+             eachindex, broadcastable, vec, *, adjoint, transpose, inv, lastindex,
+             isassigned, reverse!, reverse, push!, pop!, vcat, hcat, hvcat, repeat, sum,
+             prod, maximum, minimum, all, any, extrema, searchsorted, searchsortedfirst,
              searchsortedlast, findfirst, findlast, findnext, findprev, findall, findmax,
              findmin, findmax!, findmin!
 
@@ -239,6 +239,11 @@ function get_noninbounds end
 
 @inline function getindex(A::AbstractInboundsArray, args...)
     return @inbounds InboundsArray(getindex(A.a, args...))
+end
+
+# Let an InboundsArray be used for indexing like an Array
+@inline function to_index(inds::AbstractInboundsArray)
+    return to_index(inds.a)
 end
 
 @inline function setindex!(A::AbstractInboundsArray, v, i::Int)

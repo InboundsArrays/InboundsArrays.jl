@@ -48,6 +48,11 @@ function runtests()
 
     @testset "InboundsArrays" verbose=true begin
         @testset "InboundsVector" begin
+            @test InboundsVector{Float64}(undef, 2) isa InboundsVector{Float64, Vector{Float64}}
+            @test InboundsVector{Union{Float64, Missing}}(missing, 2) isa InboundsVector{Union{Float64, Missing}, Vector{Union{Float64, Missing}}}
+            @test InboundsVector{Float64, Vector{Float64}}(undef, 2) isa InboundsVector{Float64, Vector{Float64}}
+            @test InboundsVector{Union{Float64, Missing}, Vector{Union{Float64, Missing}}}(missing, 2) isa InboundsVector{Union{Float64, Missing}, Vector{Union{Float64, Missing}}}
+
             a = InboundsVector([1.0, 2.0, 3.0, 4.0])
             b = InboundsVector([5.0, 6.0, 7.0, 8.0])
 
@@ -187,6 +192,11 @@ function runtests()
         end
 
         @testset "InboundsMatrix" begin
+            @test InboundsMatrix{Float64}(undef, 2, 3) isa InboundsMatrix{Float64, Matrix{Float64}}
+            @test InboundsMatrix{Union{Float64, Missing}}(missing, 2, 3) isa InboundsMatrix{Union{Float64, Missing}, Matrix{Union{Float64, Missing}}}
+            @test InboundsMatrix{Float64, Matrix{Float64}}(undef, 2, 3) isa InboundsMatrix{Float64, Matrix{Float64}}
+            @test InboundsMatrix{Union{Float64, Missing}, Matrix{Union{Float64, Missing}}}(missing, 2, 3) isa InboundsMatrix{Union{Float64, Missing}, Matrix{Union{Float64, Missing}}}
+
             a = InboundsMatrix([1.0 2.0; 3.0 4.0])
             b = InboundsMatrix([5.0 6.0; 7.0 8.0])
 
@@ -267,6 +277,26 @@ function runtests()
         end
 
         @testset "InboundsArray" begin
+            # Test constructors
+            @test InboundsArray{Float64}(undef) isa InboundsArray{Float64, 0, Array{Float64, 0}}
+            @test InboundsArray{Float64}(undef, 2) isa InboundsArray{Float64, 1, Array{Float64, 1}}
+            @test InboundsArray{Float64}(undef, 2, 3) isa InboundsArray{Float64, 2, Array{Float64, 2}}
+            @test InboundsArray{Union{Float64, Missing}}(missing) isa InboundsArray{Union{Float64, Missing}, 0, Array{Union{Float64, Missing}, 0}}
+            @test InboundsArray{Union{Float64, Missing}}(missing, 2) isa InboundsArray{Union{Float64, Missing}, 1, Array{Union{Float64, Missing}, 1}}
+            @test InboundsArray{Union{Float64, Missing}}(missing, 2, 3) isa InboundsArray{Union{Float64, Missing}, 2, Array{Union{Float64, Missing}, 2}}
+            @test InboundsArray{Float64, 0}(undef) isa InboundsArray{Float64, 0, Array{Float64, 0}}
+            @test InboundsArray{Float64, 1}(undef, 2) isa InboundsArray{Float64, 1, Array{Float64, 1}}
+            @test InboundsArray{Float64, 2}(undef, 2, 3) isa InboundsArray{Float64, 2, Array{Float64, 2}}
+            @test InboundsArray{Union{Float64, Missing}, 0}(missing) isa InboundsArray{Union{Float64, Missing}, 0, Array{Union{Float64, Missing}, 0}}
+            @test InboundsArray{Union{Float64, Missing}, 1}(missing, 2) isa InboundsArray{Union{Float64, Missing}, 1, Array{Union{Float64, Missing}, 1}}
+            @test InboundsArray{Union{Float64, Missing}, 2}(missing, 2, 3) isa InboundsArray{Union{Float64, Missing}, 2, Array{Union{Float64, Missing}, 2}}
+            @test InboundsArray{Float64, 0, Array{Float64, 0}}(undef) isa InboundsArray{Float64, 0, Array{Float64, 0}}
+            @test InboundsArray{Float64, 1, Array{Float64, 1}}(undef, 2) isa InboundsArray{Float64, 1, Array{Float64, 1}}
+            @test InboundsArray{Float64, 2, Array{Float64, 2}}(undef, 2, 3) isa InboundsArray{Float64, 2, Array{Float64, 2}}
+            @test InboundsArray{Union{Float64, Missing}, 0, Array{Union{Float64, Missing}, 0}}(missing) isa InboundsArray{Union{Float64, Missing}, 0, Array{Union{Float64, Missing}, 0}}
+            @test InboundsArray{Union{Float64, Missing}, 1, Array{Union{Float64, Missing}, 1}}(missing, 2) isa InboundsArray{Union{Float64, Missing}, 1, Array{Union{Float64, Missing}, 1}}
+            @test InboundsArray{Union{Float64, Missing}, 2, Array{Union{Float64, Missing}, 2}}(missing, 2, 3) isa InboundsArray{Union{Float64, Missing}, 2, Array{Union{Float64, Missing}, 2}}
+
             a = InboundsArray([1.0 2.0; 3.0 4.0;;; 1.0 2.0; 3.0 4.0])
             b = InboundsArray([5.0 6.0; 7.0 8.0;;; 5.0 6.0; 7.0 8.0])
 

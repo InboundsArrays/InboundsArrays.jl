@@ -139,9 +139,48 @@ import Base: getindex, setindex!, size, IndexStyle, length, ndims, eltype, simil
 # This version handles any scalar `A`, because the default constructor for the `struct`
 # defines a more-specific method for any `A` that is an `AbstractArray`
 @inline InboundsArray(A) = A
+@inline InboundsArray{T}(A) where T = A
+@inline InboundsArray{T, N}(A) where {T, N} = A
+@inline InboundsArray{T, N, TArray}(A) where {T, N, TArray} = A
+
+function InboundsArray{T}(::UndefInitializer, args...) where T
+    return InboundsArray(Array{T}(undef, args...))
+end
+
+function InboundsArray{T}(::Missing, args...) where T
+    return InboundsArray(Array{T}(missing, args...))
+end
 
 function InboundsArray{T}(arg1, arg2, args...) where T
     return InboundsArray(Array{T}(arg1, arg2, args...))
+end
+
+function InboundsArray{T, N}(::UndefInitializer, args...) where {T, N}
+    return InboundsArray(Array{T, N}(undef, args...))
+end
+
+function InboundsArray{T, N}(::Missing, args...) where {T, N}
+    return InboundsArray(Array{T, N}(missing, args...))
+end
+
+function InboundsArray{T, N}(arg1, arg2, args...) where {T, N}
+    return InboundsArray(Array{T, N}(arg1, arg2, args...))
+end
+
+function InboundsArray{T, 0, TArray}(::UndefInitializer) where {T, TArray}
+    return InboundsArray(TArray(undef))
+end
+
+function InboundsArray{T, 0, TArray}(::Missing) where {T, TArray}
+    return InboundsArray(TArray(missing))
+end
+
+function InboundsArray{T, N, TArray}(::UndefInitializer, args...) where {T, N, TArray}
+    return InboundsArray(TArray(undef, args...))
+end
+
+function InboundsArray{T, N, TArray}(::Missing, args...) where {T, N, TArray}
+    return InboundsArray(TArray(missing, args...))
 end
 
 function InboundsArray{T, N, TArray}(arg1, arg2, args...) where {T, N, TArray}
@@ -152,11 +191,19 @@ function InboundsVector(v::AbstractVector{T}) where T
     return InboundsArray(v)
 end
 
-function InboundsVector{T}(arg1, arg2) where T
+function InboundsVector{T}(arg1::UndefInitializer, arg2) where T
     return InboundsVector(Vector{T}(arg1, arg2))
 end
 
-function InboundsVector{T, TVector}(arg1, arg2) where {T, TVector}
+function InboundsVector{T}(arg1::Missing, arg2) where T
+    return InboundsVector(Vector{T}(arg1, arg2))
+end
+
+function InboundsVector{T, TVector}(arg1::UndefInitializer, arg2) where {T, TVector}
+    return InboundsVector(TVector(arg1, arg2))
+end
+
+function InboundsVector{T, TVector}(arg1::Missing, arg2) where {T, TVector}
     return InboundsVector(TVector(arg1, arg2))
 end
 
@@ -164,11 +211,19 @@ function InboundsMatrix(m::AbstractMatrix{T}) where T
     return InboundsArray(m)
 end
 
-function InboundsMatrix{T}(arg1, arg2, arg3) where T
+function InboundsMatrix{T}(arg1::UndefInitializer, arg2, arg3) where T
     return InboundsMatrix(Matrix{T}(arg1, arg2, arg3))
 end
 
-function InboundsMatrix{T, TMatrix}(arg1, arg2, arg3) where {T, TMatrix}
+function InboundsMatrix{T}(arg1::Missing, arg2, arg3) where T
+    return InboundsMatrix(Matrix{T}(arg1, arg2, arg3))
+end
+
+function InboundsMatrix{T, TMatrix}(arg1::UndefInitializer, arg2, arg3) where {T, TMatrix}
+    return InboundsMatrix(TMatrix(arg1, arg2, arg3))
+end
+
+function InboundsMatrix{T, TMatrix}(arg1::Missing, arg2, arg3) where {T, TMatrix}
     return InboundsMatrix(TMatrix(arg1, arg2, arg3))
 end
 

@@ -368,6 +368,10 @@ end
     return InboundsArray(@inbounds view(a.a, I...))
 end
 
+@inline function maybeview(a::AbstractInboundsArray, I::Vararg{Union{Number, Base.AbstractCartesianIndex},M}) where M
+    return InboundsArray(@inbounds maybeview(a.a, I...))
+end
+
 @inline function maybeview(a::AbstractInboundsArray, I::Vararg{Any,M}) where M
     return InboundsArray(@inbounds maybeview(a.a, I...))
 end

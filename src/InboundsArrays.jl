@@ -129,8 +129,8 @@ import Base: getindex, setindex!, size, IndexStyle, length, ndims, similar, axes
              BroadcastStyle, copyto!, copy, resize!, unsafe_convert, strides, elsize,
              view, maybeview, reshape, selectdim, isapprox, iterate, eachindex,
              broadcastable, vec, *, adjoint, transpose, inv, lastindex, isassigned,
-             reverse!, reverse, push!, pop!, vcat, hcat, hvcat, sum, prod, maximum,
-             minimum, all, any, extrema, searchsorted, searchsortedfirst,
+             reverse!, reverse, push!, pop!, vcat, hcat, hvcat, repeat, sum, prod,
+             maximum, minimum, all, any, extrema, searchsorted, searchsortedfirst,
              searchsortedlast, findfirst, findlast, findnext, findprev, findall, findmax,
              findmin, findmax!, findmin!
 
@@ -354,6 +354,7 @@ end
                        b::Union{Number, AbstractInboundsArray{<:Number}}...)
     return InboundsArray(@inbounds hvcat(blocks_per_row, a.a, (x isa AbstractInboundsArray ? x.a : x for x ∈ b)...))
 end
+@inline repeat(A::AbstractInboundsArray, counts::Integer...) = InboundsArray(@inbounds repeat(A.a, counts...))
 
 @inline adjoint(A::InboundsArray) = InboundsArray(@inbounds adjoint(A.a))
 @inline transpose(A::InboundsArray) = InboundsArray(@inbounds transpose(A.a))

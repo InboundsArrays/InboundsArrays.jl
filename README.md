@@ -114,7 +114,7 @@ At present, `InboundsArray` supports:
     * Broadcasting
     * `reshape()`, `vec()`, `selectdim()`
     * `reverse!()`, `reverse()`, `push!()`, `pop!()`
-    * `vcat()`, `hcat()`, `hvcat()`
+    * `vcat()`, `hcat()`, `hvcat()`, `repeat()`
     * `sum()`, `prod()`, `maximum()`, `minimum()`, `extrema()`, `all()`, `any()`
     * `adjoint()`, `transpose()`, `inv()`
     * `searchsorted()`, `searchsortedfirst()`, `searchsortedlast()`,

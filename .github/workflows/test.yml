@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        abstractarray: [false, true]
+        no-abstractarray: [false, true]
         julia_version: ['1.10', '1']
       fail-fast: false
     timeout-minutes: 20
@@ -32,8 +32,8 @@ jobs:
       # recompile anyway.
       #- uses: julia-actions/julia-buildpkg@v1
       - run: |
-          julia --project --check-bounds=yes -e 'using InboundsArrays; InboundsArrays.set_inherit_from_AbstractArray(true)'
-        if: matrix.abstractarray
+          julia --project --check-bounds=yes -e 'using InboundsArrays; InboundsArrays.set_inherit_from_AbstractArray(false)'
+        if: matrix.no-abstractarray
         shell: bash
       - uses: julia-actions/julia-runtest@v1
 
@@ -42,7 +42,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        abstractarray: [false, true]
+        no-abstractarray: [false, true]
         julia_version: ['1.10', '1']
       fail-fast: false
     timeout-minutes: 20
@@ -58,8 +58,8 @@ jobs:
         shell: bash
       - uses: julia-actions/julia-buildpkg@v1
       - run: |
-          julia --project -e 'using InboundsArrays; InboundsArrays.set_inherit_from_AbstractArray(true)'
-        if: matrix.abstractarray
+          julia --project -e 'using InboundsArrays; InboundsArrays.set_inherit_from_AbstractArray(false)'
+        if: matrix.no-abstractarray
         shell: bash
       # The following is copied and simplified from
       # https://github.com/julia-actions/julia-runtest/blob/master/action.yml

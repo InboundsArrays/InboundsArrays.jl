@@ -34,6 +34,8 @@ struct InboundsSparseMatrixCSC{Tv, Ti <: Integer} <: AbstractSparseMatrixCSC{Tv,
     end
 end
 
+InboundsSparseMatrixCSC(m::InboundsSparseMatrixCSC) = m
+
 @inline function size(A::InboundsSparseMatrixCSC)
     return size(A.parent)
 end
@@ -75,6 +77,7 @@ function copy(m::InboundsSparseMatrixCSC{Tv, Ti}) where {Tv, Ti}
     return InboundsSparseMatrixCSC(parentcopy)
 end
 
+@inline sparse(m::AbstractInboundsArray{T, 2} where T) = InboundsSparseMatrixCSC(sparse(m.a))
 @inline sparse(m::InboundsSparseMatrixCSC) = copy(m)
 @inline sparse(I::InboundsVector, J::InboundsVector, V::InboundsVector) = InboundsSparseMatrixCSC(sparse(I.a, J.a, V.a))
 

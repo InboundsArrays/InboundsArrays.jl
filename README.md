@@ -135,6 +135,8 @@ At present, `InboundsArray` supports:
 * `HDF5` is intended to support all functionality
 * `LinearAlgebra`
     * `mul!`, `lu`, `lu!`, `ldiv`, `ldiv!`, `*`
+* `LsqFit`
+    * `curve_fit`
 * `MPI` is intended to support all functions by wrapping those listed, but has
   not been comprehensively tested
     * `Buffer`, `UBuffer`, `VBuffer`

@@ -1,7 +1,7 @@
 name = "InboundsArrays"
 uuid = "fb0a3009-a0ba-48c7-b828-2efdeaae8962"
 authors = ["John Omotani <john.omotani@ukaea.uk>"]
-version = "0.3.1"
+version = "0.3.2"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"

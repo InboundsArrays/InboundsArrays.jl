@@ -344,7 +344,16 @@ end
 @inline function reshape(a::AbstractInboundsArray, dims::Int64...)
     return InboundsArray(@inbounds reshape(a.a, dims...))
 end
-@inline function reshape(a::AbstractInboundsArray, dims::Tuple)
+@inline function reshape(a::AbstractInboundsArray, dims::Tuple{Vararg{Union{Colon, Integer, AbstractUnitRange}}})
+    return InboundsArray(@inbounds reshape(a.a, dims))
+end
+@inline function reshape(a::AbstractInboundsArray, dims::Tuple{Vararg{Union{Colon, Int64}}})
+    return InboundsArray(@inbounds reshape(a.a, dims))
+end
+@inline function reshape(a::AbstractInboundsArray, dims::Tuple{Vararg{Int64, N}} where N)
+    return InboundsArray(@inbounds reshape(a.a, dims))
+end
+@inline function reshape(a::AbstractInboundsArray, dims::Tuple{Union{Integer, Base.OneTo}, Vararg{Union{Integer, Base.OneTo}}})
     return InboundsArray(@inbounds reshape(a.a, dims))
 end
 

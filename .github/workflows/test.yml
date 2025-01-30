@@ -25,7 +25,7 @@ jobs:
           version: '${{ matrix.julia_version }}'
       - uses: julia-actions/cache@v2
       - run: |
-          julia --project --check-bounds=yes -e 'import Pkg; Pkg.add(["FFTW", "HDF5", "CairoMakie", "MPI", "NCDatasets", "NaNMath", "StatsBase"])'
+          julia --project --check-bounds=yes -e 'import Pkg; Pkg.add(["FFTW", "HDF5", "CairoMakie", "LsqFit", "MPI", "NCDatasets", "NaNMath", "StatsBase"])'
         shell: bash
       # julia-buildpkg would build using --check-bounds=auto, so Pkg.test()
       # which defaults to --check-bounds=yes would cause everything to
@@ -54,7 +54,7 @@ jobs:
           version: '${{ matrix.julia_version }}'
       - uses: julia-actions/cache@v2
       - run: |
-          julia --project -e 'import Pkg; Pkg.add(["FFTW", "HDF5", "CairoMakie", "MPI", "NCDatasets", "NaNMath", "StatsBase"])'
+          julia --project -e 'import Pkg; Pkg.add(["FFTW", "HDF5", "CairoMakie", "LsqFit", "MPI", "NCDatasets", "NaNMath", "StatsBase"])'
         shell: bash
       - uses: julia-actions/julia-buildpkg@v1
       - run: |

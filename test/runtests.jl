@@ -20,6 +20,10 @@ try
 catch
 end
 try
+    using LsqFit
+catch
+end
+try
     using MPI
 catch
 end
@@ -795,6 +799,33 @@ function runtests()
                 @test isequal(a_io[:, :, :, :], ones(3, 4, 5, 2))
 
                 close(f)
+            end
+        end
+
+        lsqfitext = Base.get_extension(InboundsArrays, :LsqFitExt)
+        if lsqfitext !== nothing
+            @testset "LsqFitExt" begin
+                # Based on the example in the curve_fit() docstring, and LsqFit.jl
+                # tutorial
+                model(x, p) = @. p[1]*exp(-x*p[2])
+                function j_m(t,p)
+                    J = Array{Float64}(undef, length(t),length(p))
+                    J[:,1] = exp.(p[2] .* t)       #df/dp[1]
+                    J[:,2] = t .* p[1] .* J[:,1]   #df/dp[2]
+                    J
+                end
+                xdata = InboundsArray(range(0, stop=10, length=20))
+                ydata = model(xdata, [1.0 2.0]) .+ 0.01.*range(0, stop=1, length=length(xdata))
+                p0 = InboundsArray([0.5, 0.5])
+                wt = InboundsArray(fill(0.5, 20,20))
+                for i ∈ 1:20
+                    wt[i,i] = 1.0
+                end
+
+                @test curve_fit(model, xdata, ydata, p0) isa Any
+                @test curve_fit(model, xdata, ydata, wt, p0) isa Any
+                @test curve_fit(model, j_m, xdata, ydata, p0) isa Any
+                @test curve_fit(model, j_m, xdata, ydata, wt, p0) isa Any
             end
         end
 

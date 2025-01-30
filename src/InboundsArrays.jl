@@ -265,6 +265,9 @@ end
 @inline function IndexStyle(::InboundsArray{T, N, TArray}) where {T, N, TArray}
     return IndexStyle(TArray)
 end
+@inline function IndexStyle(A::AbstractInboundsArray)
+    return IndexStyle(A.a)
+end
 @inline IndexStyle(A::AbstractInboundsArray, B::AbstractInboundsArray) = IndexStyle(IndexStyle(A), IndexStyle(B))
 @inline IndexStyle(A::AbstractInboundsArray, B::AbstractArray) = IndexStyle(IndexStyle(A), IndexStyle(B))
 @inline IndexStyle(A::AbstractArray, B::AbstractInboundsArray) = IndexStyle(IndexStyle(A), IndexStyle(B))
@@ -279,23 +282,23 @@ end
 
 @inline eltype(A::AbstractInboundsArray{T, N}) where {T, N} = T
 
-@inline function similar(A::InboundsArray)
+@inline function similar(A::AbstractInboundsArray)
     return InboundsArray(similar(A.a))
 end
 
-@inline function similar(A::InboundsArray, type::Type{S}) where S
+@inline function similar(A::AbstractInboundsArray, type::Type{S}) where S
     return InboundsArray(similar(A.a, type))
 end
 
-@inline function similar(A::InboundsArray, dims::Dims)
+@inline function similar(A::AbstractInboundsArray, dims::Dims)
     return InboundsArray(similar(A.a, dims))
 end
 
-@inline function similar(A::InboundsArray, type::Type{S}, dims::Dims) where S
+@inline function similar(A::AbstractInboundsArray, type::Type{S}, dims::Dims) where S
     return InboundsArray(similar(A.a, type, dims))
 end
 
-@inline function similar(A::InboundsArray, type::Type{S}, dims::Tuple{Int64, Vararg{Int64, N}}) where {S, N}
+@inline function similar(A::AbstractInboundsArray, type::Type{S}, dims::Tuple{Int64, Vararg{Int64, N}}) where {S, N}
     return InboundsArray(similar(A.a, type, dims))
 end
 
@@ -328,10 +331,10 @@ find_iba(bc::Base.Broadcast.Broadcasted) = find_iba(bc.args)
 find_iba(args::Tuple) = find_iba(find_iba(args[1]), Base.tail(args))
 find_iba(x) = x
 find_iba(::Tuple{}) = nothing
-find_iba(a::InboundsArray, rest) = a
+find_iba(a::AbstractInboundsArray, rest) = a
 find_iba(::Any, rest) = find_iba(rest)
 
-@inline function copyto!(A::InboundsArray, bc::Broadcast.Broadcasted{InboundsArrayStyle{N}}) where N
+@inline function copyto!(A::AbstractInboundsArray, bc::Broadcast.Broadcasted{InboundsArrayStyle{N}}) where N
     @inbounds copyto!(A.a, bc)
     return A
 end

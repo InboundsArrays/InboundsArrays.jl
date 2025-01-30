@@ -379,6 +379,9 @@ end
 @inline function *(A::InboundsArray{TA, NA, TArrayA}, x::AbstractArray{Tx, Nx}) where {TA, NA, TArrayA, Tx, Nx}
     return InboundsArray(@inbounds A.a * x)
 end
+@inline function *(A::InboundsArray{TA, NA, TArrayA}, x::AbstractVector{Tx}) where {TA, NA, TArrayA, Tx}
+    return InboundsArray(@inbounds A.a * x)
+end
 @inline function *(A::AbstractMatrix{TA}, x::InboundsArray{Tx, Nx, TArrayx}) where {TA, Tx, Nx, TArrayx}
     return InboundsArray(@inbounds A * x.a)
 end

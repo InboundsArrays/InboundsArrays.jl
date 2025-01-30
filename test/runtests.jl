@@ -665,8 +665,7 @@ function runtests()
             @test sC isa InboundsSparseMatrixCSR
         end
 
-        fftwext = Base.get_extension(InboundsArrays, :FFTWExt)
-        if fftwext !== nothing
+        if @isdefined FFTW
             @testset "FFTWExt" begin
                 a = InboundsArray(ones(Complex{Float64}, 8))
 
@@ -690,8 +689,7 @@ function runtests()
             end
         end
 
-        hdf5ext = Base.get_extension(InboundsArrays, :HDF5Ext)
-        if hdf5ext !== nothing
+        if @isdefined HDF5
             @testset "HDF5Ext" begin
                 v = InboundsArray(ones(3))
                 m = InboundsArray(ones(3, 4))
@@ -747,8 +745,7 @@ function runtests()
             end
         end
 
-        ncdatasetsext = Base.get_extension(InboundsArrays, :NCDatasetsExt)
-        if ncdatasetsext !== nothing
+        if @isdefined NCDatasets
             @testset "NCDatasetsExt" begin
                 v = InboundsArray(ones(3))
                 m = InboundsArray(ones(3, 4))
@@ -802,8 +799,7 @@ function runtests()
             end
         end
 
-        lsqfitext = Base.get_extension(InboundsArrays, :LsqFitExt)
-        if lsqfitext !== nothing
+        if @isdefined LsqFit
             @testset "LsqFitExt" begin
                 # Based on the example in the curve_fit() docstring, and LsqFit.jl
                 # tutorial
@@ -829,8 +825,7 @@ function runtests()
             end
         end
 
-        makieext = Base.get_extension(InboundsArrays, :MakieExt)
-        if makieext !== nothing
+        if @isdefined CairoMakie
             @testset "MakieExt" begin
                 a = InboundsArray([1.0, 2.0, 3.0])
 
@@ -839,8 +834,7 @@ function runtests()
             end
         end
 
-        mpiext = Base.get_extension(InboundsArrays, :MPIExt)
-        if mpiext !== nothing
+        if @isdefined MPI
             @testset "MPIExt" begin
                 a = InboundsArray(ones(3, 4, 5))
                 b = similar(a)
@@ -866,8 +860,8 @@ function runtests()
             end
         end
 
-        nanmathext = Base.get_extension(InboundsArrays, :NaNMathExt)
-        if nanmathext !== nothing
+        if @isdefined NaNMath
+            nanmathext = Base.get_extension(InboundsArrays, :NaNMathExt)
             @testset "NaNMathExt" begin
                 a = InboundsArray([1.0, 2.0, 3.0])
 
@@ -878,8 +872,8 @@ function runtests()
             end
         end
 
-        statsbaseext = Base.get_extension(InboundsArrays, :StatsBaseExt)
-        if statsbaseext !== nothing
+        if @isdefined StatsBase
+            statsbaseext = Base.get_extension(InboundsArrays, :StatsBaseExt)
             @testset "StatsBaseExt" begin
                 a = InboundsArray([1.0, 2.0, 3.0])
                 b = InboundsArray([4.0, 5.0, 6.0])

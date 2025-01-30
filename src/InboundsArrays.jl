@@ -272,6 +272,7 @@ end
 @inline IndexStyle(A::AbstractInboundsArray, B::AbstractArray) = IndexStyle(IndexStyle(A), IndexStyle(B))
 @inline IndexStyle(A::AbstractArray, B::AbstractInboundsArray) = IndexStyle(IndexStyle(A), IndexStyle(B))
 @inline IndexStyle(A::AbstractInboundsArray, B...) = IndexStyle(IndexStyle(A), IndexStyle(B...))
+@inline IndexStyle(A::AbstractInboundsArray, B::AbstractInboundsArray...) = IndexStyle(IndexStyle(A), IndexStyle(B...))
 @inline IndexStyle(A::AbstractArray, B::AbstractInboundsArray, C...) = IndexStyle(IndexStyle(A), IndexStyle(B, IndexStyle(C...)))
 
 @inline function length(A::AbstractInboundsArray)
